@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SignWorld — Learn Sign Language Free</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
+:root{--bg:#080b14;--s1:#0d1118;--s2:#131720;--s3:#1a1f2e;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);--tx:#e8eaf0;--mu:#5a6175;--ac:#6c47ff;--ac2:#ff4791;--g:#22c55e;--am:#f59e0b;--rd:#ef4444;--cy:#06b6d4}
+body{background:var(--bg);color:var(--tx);min-height:100vh}
+.page{display:none}.page.on{display:block}
+button{font-family:inherit;cursor:pointer;transition:all .15s;outline:none}
+input{font-family:inherit;outline:none}
+@keyframes up{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pop{0%{transform:scale(.93);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes bounce2{0%,80%,100%{transform:translateY(0);opacity:.4}40%{transform:translateY(-5px);opacity:1}}
+.fade{animation:up .3s ease both}
+nav{background:rgba(8,11,20,.97);border-bottom:1px solid var(--bd);padding:11px 22px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
+.logo{font-size:18px;font-weight:800;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--ac),var(--ac2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;cursor:pointer}
+.nbtn{padding:7px 15px;border-radius:9px;border:1px solid var(--bd2);background:transparent;color:var(--mu);font-size:12px}
+.nbtn:hover{color:var(--tx);background:rgba(255,255,255,.06)}
+.nbtn.hi{background:var(--ac);border-color:var(--ac);color:#fff;font-weight:700}
+.nbtn.hi:hover{background:#7c5cff}
+.btn-p{padding:12px 28px;border-radius:12px;background:var(--ac);border:none;color:#fff;font-size:14px;font-weight:800}
+.btn-p:hover{background:#7c5cff;transform:translateY(-1px)}
+.btn-o{padding:10px 22px;border-radius:12px;background:transparent;border:1px solid var(--bd2);color:var(--tx);font-size:13px}
+.btn-o:hover{background:rgba(255,255,255,.05)}
+.card{background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:16px}
+.pbar{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
+.pfill{height:100%;border-radius:3px;transition:width 1.2s ease}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
+input::placeholder{color:var(--mu)}
+</style>
+</head>
+<body>
+
+<!-- ───────── HOME ───────── -->
+<div class="page on" id="pg-home">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px">
+    <button class="nbtn" onclick="go('dashboard')">Dashboard</button>
+    <button class="nbtn hi" id="startBtn" onclick="go('onboard')">Start Free →</button>
+  </div>
+</nav>
+<div style="text-align:center;padding:64px 24px 52px;max-width:700px;margin:0 auto" class="fade">
+  <div style="font-size:15px;color:#a78bfa;font-weight:700;letter-spacing:.4px;margin-bottom:18px">🌍 466 million deaf people. Start communicating today.</div>
+  <h1 style="font-size:clamp(34px,7vw,64px);font-weight:900;letter-spacing:-2.5px;line-height:1.05;margin-bottom:18px">Learn sign language<br><span style="background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">in 10 minutes a day</span></h1>
+  <p style="font-size:17px;color:var(--mu);line-height:1.7;margin-bottom:34px">Structured lessons. AI tutor. Real-time feedback.<br>The only sign language app built for outcomes.</p>
+  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px">
+    <button class="btn-p" style="font-size:16px;padding:15px 38px" id="heroStartBtn">🚀 Start Free — No Signup</button>
+    <button class="btn-o" onclick="go('tutor')">💬 Try AI Tutor</button>
+  </div>
+  <!-- Stats grid — static HTML (was broken template literal) -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;max-width:680px;margin:0 auto">
+    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:26px;font-weight:900;color:#a78bfa;margin-bottom:4px">466M</div>
+      <div style="font-size:11px;color:var(--mu)">Deaf worldwide</div>
+    </div>
+    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:26px;font-weight:900;color:#34d399;margin-bottom:4px">300+</div>
+      <div style="font-size:11px;color:var(--mu)">Sign languages</div>
+    </div>
+    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)">
+      <div style="font-size:26px;font-weight:900;color:#f472b6;margin-bottom:4px">17</div>
+      <div style="font-size:11px;color:var(--mu)">Structured lessons</div>
+    </div>
+    <div style="padding:20px 14px;text-align:center">
+      <div style="font-size:26px;font-weight:900;color:#fb923c;margin-bottom:4px">Free</div>
+      <div style="font-size:11px;color:var(--mu)">Forever core</div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:0 24px 60px;max-width:900px;margin:0 auto">
+  <div style="text-align:center;margin-bottom:30px"><h2 style="font-size:28px;font-weight:800;letter-spacing:-.5px">Built for outcomes, not features</h2></div>
+  <!-- Feature cards — static HTML (was broken template literal) -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:52px">
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px">
+      <div style="font-size:28px;margin-bottom:10px">📚</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:5px">Structured Path</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.6">17 lessons across 5 chapters. A to Z, then real vocabulary.</div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px">
+      <div style="font-size:28px;margin-bottom:10px">🤖</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:5px">AI Tutor</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.6">Ask anything. Get corrections. Natural conversation practice.</div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px">
+      <div style="font-size:28px;margin-bottom:10px">⚡</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:5px">Live Feedback</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.6">Real-time grammar and sign analysis on every message.</div>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px">
+      <div style="font-size:28px;margin-bottom:10px">📊</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:5px">Track Progress</div>
+      <div style="font-size:12px;color:var(--mu);line-height:1.6">XP, streaks, skill rings — see exactly how far you've come.</div>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,rgba(108,71,255,.12),rgba(255,71,145,.07));border:1px solid rgba(108,71,255,.2);border-radius:20px;padding:48px 24px;text-align:center;margin-bottom:16px">
+    <div style="font-size:36px;margin-bottom:14px">💬</div>
+    <blockquote style="font-size:20px;font-weight:700;line-height:1.4;margin-bottom:12px">"The moment a hearing person signs to me,<br>I don't feel <span style="color:var(--ac)">invisible</span> anymore."</blockquote>
+    <div style="font-size:13px;color:var(--mu)">— A deaf student, 22, India</div>
+  </div>
+</div>
+</div>
+
+<!-- ───────── ONBOARD ───────── -->
+<div class="page" id="pg-onboard">
+<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px">
+  <div style="max-width:460px;width:100%" class="fade">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:48px;margin-bottom:12px">🤟</div>
+      <h1 style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Welcome to SignWorld</h1>
+      <p style="color:var(--mu);font-size:14px">Let's personalize your learning journey</p>
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px">What's your name?</div>
+      <input id="nameIn" placeholder="Your first name..." style="width:100%;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--tx);font-size:14px">
+    </div>
+    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px">Your level</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="lvlGrid"></div>
+    </div>
+    <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="doOnboard()">Begin My Journey →</button>
+  </div>
+</div>
+</div>
+
+<!-- ───────── DASHBOARD ───────── -->
+<div class="page" id="pg-dashboard">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px;align-items:center">
+    <button class="nbtn" onclick="go('lessons')">Lessons</button>
+    <button class="nbtn" onclick="go('tutor')">AI Tutor</button>
+    <button class="nbtn" onclick="go('progress')">Progress</button>
+    <button class="nbtn" onclick="go('share')">Share</button>
+    <span class="pill" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25);color:var(--am)" id="hStreak">🔥1</span>
+    <span class="pill" style="background:rgba(108,71,255,.12);border-color:rgba(108,71,255,.25);color:#a78bfa" id="hXP">⭐0</span>
+  </div>
+</nav>
+<div style="padding:24px;max-width:900px;margin:0 auto" class="fade" id="dashBody"></div>
+</div>
+
+<!-- ───────── LESSONS ───────── -->
+<div class="page" id="pg-lessons">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px"><button class="nbtn" onclick="go('dashboard')">← Dashboard</button></div>
+</nav>
+<div style="padding:24px;max-width:900px;margin:0 auto" class="fade" id="lessonsBody"></div>
+</div>
+
+<!-- ───────── LESSON VIEW ───────── -->
+<div class="page" id="pg-lesson">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px"><button class="nbtn" onclick="go('lessons')">← Lessons</button></div>
+</nav>
+<div style="padding:24px;max-width:640px;margin:0 auto" class="fade" id="lessonBody"></div>
+</div>
+
+<!-- ───────── AI TUTOR ───────── -->
+<div class="page" id="pg-tutor">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px"><button class="nbtn" onclick="go('dashboard')">← Dashboard</button><button class="nbtn" onclick="go('lessons')">Lessons</button></div>
+</nav>
+<div style="display:flex;height:calc(100vh - 57px)">
+  <div style="width:200px;background:var(--s1);border-right:1px solid var(--bd);padding:12px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto;flex-shrink:0" id="tutorSidebar"></div>
+  <div style="flex:1;display:flex;flex-direction:column">
+    <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px" id="chatMsgs"></div>
+    <div id="errBanner" style="display:none;padding:10px 16px;background:rgba(239,68,68,.09);border-top:1px solid rgba(239,68,68,.2);font-size:13px;color:#fca5a5"></div>
+    <div style="padding:12px 14px;border-top:1px solid var(--bd);display:flex;gap:9px;background:var(--s1);flex-shrink:0">
+      <input id="chatIn" placeholder="Message your tutor... (Enter to send)" style="flex:1;padding:10px 15px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:11px;color:var(--tx);font-size:13px">
+      <button id="sendBtn" class="btn-p" style="padding:10px 20px;font-size:13px" onclick="sendChat()">Send</button>
+    </div>
+  </div>
+  <div style="width:210px;background:var(--s1);border-left:1px solid var(--bd);padding:12px;overflow-y:auto;flex-shrink:0">
+    <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--mu);margin-bottom:10px">LIVE FEEDBACK</div>
+    <div id="feedPanel" style="font-size:12px;color:var(--mu)">Send a message to get real-time feedback.</div>
+    <div style="font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--mu);margin:14px 0 8px">RECENT SIGNS</div>
+    <div id="signsPanel"></div>
+  </div>
+</div>
+</div>
+
+<!-- ───────── PROGRESS ───────── -->
+<div class="page" id="pg-progress">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px"><button class="nbtn" onclick="go('dashboard')">← Dashboard</button><button class="nbtn" onclick="go('share')">Share</button></div>
+</nav>
+<div style="padding:24px;max-width:800px;margin:0 auto" class="fade" id="progBody"></div>
+</div>
+
+<!-- ───────── SHARE ───────── -->
+<div class="page" id="pg-share">
+<nav>
+  <div class="logo" onclick="go('home')">🤟 SignWorld</div>
+  <div style="display:flex;gap:6px"><button class="nbtn" onclick="go('dashboard')">← Dashboard</button></div>
+</nav>
+<div style="padding:24px;max-width:640px;margin:0 auto;text-align:center" class="fade" id="shareBody"></div>
+</div>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const CUR=[
+  {id:'c1',title:'Foundations',color:'#6c47ff',icon:'🌱',lessons:[
+    {id:'l1',title:'The ILY Sign',desc:'Your first real sign',xp:20,signs:[{e:'🤟',w:'I Love You',d:'Pinky, index and thumb extended — universal ILY sign'}],quiz:{q:'ILY extends which fingers?',opts:['All five','Pinky+index+thumb','Just thumb','Index+middle'],a:1}},
+    {id:'l2',title:'Hello & Goodbye',desc:'Open every conversation',xp:25,signs:[{e:'👋',w:'Hello',d:'Wave flat hand outward from forehead'},{e:'👋',w:'Goodbye',d:'Open hand waves side to side'}],quiz:{q:'Hello in ASL: hand waves from where?',opts:['Chin','Forehead','Chest','Shoulder'],a:1}},
+    {id:'l3',title:'Thank You',desc:'Politeness in sign language',xp:20,signs:[{e:'🙏',w:'Thank You',d:'Flat hand from chin moves forward'}],quiz:{q:'Thank You starts from the?',opts:['Forehead','Chin/lips','Chest','Ear'],a:1}},
+    {id:'l4',title:'Yes & No',desc:'Most used signs ever',xp:15,signs:[{e:'✅',w:'Yes',d:'Fist nods up and down'},{e:'🚫',w:'No',d:'Index+middle snap to thumb'}],quiz:{q:'How do you sign YES?',opts:['Open palm forward','Fist bobs up and down','Point upward','Wave'],a:1}},
+  ]},
+  {id:'c2',title:'Alphabet A–Z',color:'#06b6d4',icon:'✋',lessons:[
+    {id:'l5',title:'Letters A–E',desc:'First 5 letters',xp:30,signs:[{e:'✊',w:'A',d:'Fist, thumb resting on side'},{e:'🖐',w:'B',d:'Four fingers straight up, thumb tucked'},{e:'🤏',w:'C',d:'Curve all fingers into C shape'},{e:'☝️',w:'D',d:'Index up, others form a circle'},{e:'🤜',w:'E',d:'Fingers bent forward, thumb under'}],quiz:{q:'Letter A is formed by?',opts:['Two fingers up','Fist with thumb on side','Curved C','Flat open hand'],a:1}},
+    {id:'l6',title:'Letters F–J',desc:'Letters 6–10',xp:30,signs:[{e:'👌',w:'F',d:'Index+thumb circle, others up'},{e:'👈',w:'G',d:'Index and thumb point sideways'},{e:'✌️',w:'H',d:'Two fingers horizontal'},{e:'🤙',w:'I',d:'Only pinky extended'},{e:'🤙',w:'J',d:'Like I, trace J in air'}],quiz:{q:'F handshape: index and thumb do what?',opts:['Point up','Form a circle','Cross','Spread wide'],a:1}},
+    {id:'l7',title:'Letters K–O',desc:'Middle of the alphabet',xp:30,signs:[{e:'✌️',w:'K',d:'Index up, middle slanted, thumb between'},{e:'👈',w:'L',d:'Index up, thumb out — L shape'},{e:'✊',w:'M',d:'Three fingers over thumb'},{e:'✊',w:'N',d:'Two fingers over thumb'},{e:'👌',w:'O',d:'All fingers form round O'}],quiz:{q:'L is formed by?',opts:['Crossed fingers','Index up, thumb out','Curved C','Fist'],a:1}},
+    {id:'l8',title:'Letters P–Z',desc:'Complete the alphabet!',xp:40,signs:[{e:'👇',w:'P',d:'Like K but downward'},{e:'🤞',w:'R',d:'Cross index and middle'},{e:'✊',w:'S',d:'Tight fist, thumb over all'},{e:'✌️',w:'V',d:'Peace sign'},{e:'🤙',w:'Y',d:'Pinky and thumb out'},{e:'☝️',w:'Z',d:'Trace Z in air'}],quiz:{q:'Z is signed by?',opts:['Making a fist','Crossing fingers','Tracing Z in air','Pointing down'],a:2}},
+  ]},
+  {id:'c3',title:'Numbers & Time',color:'#f59e0b',icon:'🔢',lessons:[
+    {id:'l9',title:'Numbers 1–5',desc:'Count with one hand',xp:20,signs:[{e:'☝️',w:'1',d:'Index finger up'},{e:'✌️',w:'2',d:'Peace sign'},{e:'🤟',w:'3',d:'Thumb+index+middle'},{e:'🖖',w:'4',d:'Four fingers up, thumb in'},{e:'🖐',w:'5',d:'All five fingers spread'}],quiz:{q:'3 in sign language uses?',opts:['Index+middle only','Thumb+index+middle','All four fingers','Pinky+ring'],a:1}},
+    {id:'l10',title:'Numbers 6–10',desc:'Combination numbers',xp:25,signs:[{e:'🤙',w:'6',d:'Pinky+thumb out'},{e:'🤘',w:'7',d:'Ring touches thumb'},{e:'🖕',w:'8',d:'Middle touches thumb'},{e:'👌',w:'9',d:'Index+thumb circle'},{e:'👍',w:'10',d:'Thumbs up + shake'}],quiz:{q:'10 is signed by?',opts:['All fingers up','Thumbs up and shaking','Making a circle','Tapping wrist'],a:1}},
+    {id:'l11',title:'Days of the Week',desc:'Time vocabulary',xp:30,signs:[{e:'🌅',w:'Today',d:'Both flat hands move down together'},{e:'🌙',w:'Yesterday',d:'Thumb moves back over shoulder'},{e:'⏭️',w:'Tomorrow',d:'Thumb moves forward from cheek'},{e:'📅',w:'Week',d:'Index moves across flat palm'}],quiz:{q:'Yesterday: thumb moves?',opts:['Forward','Side to side','Back over shoulder','Down'],a:2}},
+  ]},
+  {id:'c4',title:'People & Family',color:'#22c55e',icon:'👨‍👩‍👧',lessons:[
+    {id:'l12',title:'Mother & Father',desc:'Core family signs',xp:20,signs:[{e:'👩',w:'Mother',d:'Spread hand, thumb on CHIN'},{e:'👨',w:'Father',d:'Spread hand, thumb on FOREHEAD'}],quiz:{q:'Mother: thumb touches the?',opts:['Forehead','Cheek','Chin','Nose'],a:2}},
+    {id:'l13',title:'Friends & Family',desc:'Build your social vocab',xp:25,signs:[{e:'🤝',w:'Friend',d:'Hook index fingers and reverse'},{e:'👨‍👩‍👧',w:'Family',d:'F-hands circle outward from chest'},{e:'👶',w:'Baby',d:'Arms rock gently side to side'}],quiz:{q:'Friend: index fingers do what?',opts:['Point forward','Hook and reverse','Tap together','Spread apart'],a:1}},
+    {id:'l14',title:'Emotions',desc:'Express how you feel',xp:30,signs:[{e:'😊',w:'Happy',d:'Both hands brush up chest twice'},{e:'😢',w:'Sad',d:'Both hands draw down the face'},{e:'😡',w:'Angry',d:'Bent hand pulls from face outward'},{e:'😨',w:'Scared',d:'Both hands pull back sharply'}],quiz:{q:'Happy: hands move which direction?',opts:['Down the face','Up the chest','Away from face','Side to side'],a:1}},
+  ]},
+  {id:'c5',title:'Daily Life',color:'#ec4899',icon:'🏠',lessons:[
+    {id:'l15',title:'Food & Drink',desc:'Table talk essentials',xp:25,signs:[{e:'🍽️',w:'Eat',d:'Fingertips tap mouth repeatedly'},{e:'🥤',w:'Drink',d:'Curved hand tips toward mouth'},{e:'💧',w:'Water',d:'W-hand (3 fingers) taps chin twice'},{e:'☕',w:'Coffee',d:'One fist grinds on the other'}],quiz:{q:'Water: W-hand taps the?',opts:['Forehead','Chest','Chin','Ear'],a:2}},
+    {id:'l16',title:'Home & School',desc:'Places you live and learn',xp:25,signs:[{e:'🏠',w:'Home',d:'Fingertips touch mouth then cheek'},{e:'🏫',w:'School',d:'One hand claps on the other'},{e:'💼',w:'Work',d:'Fists tap wrists together'}],quiz:{q:'School is signed by?',opts:['Tapping cheek','One hand clapping on other','Fists tapping','Tracing a square'],a:1}},
+    {id:'l17',title:'Help & Emergency',desc:'Signs that can save lives',xp:40,signs:[{e:'🆘',w:'Help',d:'Fist on flat palm, both rise up'},{e:'✋',w:'Stop',d:'Flat hand chops down onto other palm'},{e:'🚑',w:'Doctor',d:'Two fingers tap wrist pulse point'},{e:'🚓',w:'Police',d:'C-hand taps badge location on chest'}],quiz:{q:'HELP: both hands move?',opts:['Apart','Down','Upward','In circles'],a:2}},
+  ]},
+];
+const ALL=CUR.flatMap(c=>c.lessons.map(l=>({...l,cc:c.id,ct:c.title,col:c.color})));
+const DAILY={e:'🌟',w:'Learn',d:'Open hand to forehead, then close like grabbing knowledge',fact:'466 million deaf people worldwide need sign language communicators.'};
+
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let ST=JSON.parse(localStorage.getItem('sw4')||'null')||{name:'',level:'beginner',done:[],xp:0,streak:1,lastDate:null,signs:[],chat:[],chatLang:'ASL',chatMode:'chat',journal:[]};
+function save(){try{localStorage.setItem('sw4',JSON.stringify(ST));}catch{}}
+function addXP(n){ST.xp+=n;save();}
+function markDone(id,signs,xpAmt){if(!ST.done.includes(id)){ST.done.push(id);addXP(xpAmt);signs.forEach(s=>{if(!ST.signs.some(x=>x.w===s.w))ST.signs.push(s);});ST.journal.push({date:new Date().toLocaleDateString(),lesson:ALL.find(l=>l.id===id)?.title||id,xp:xpAmt,signs:signs.length});save();}}
+
+let curLesson=null, lessonStep=0;
+
+// ── ROUTING ────────────────────────────────────────────────────────────────────
+function go(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  const el=document.getElementById('pg-'+pg);
+  if(el){el.classList.add('on');el.querySelectorAll('.fade').forEach(f=>{f.style.animation='none';requestAnimationFrame(()=>{f.style.animation='';});});}
+  const fns={home:renderHome,onboard:renderOnboard,dashboard:renderDash,lessons:renderLessons,lesson:renderLesson,tutor:renderTutor,progress:renderProg,share:renderShare};
+  if(fns[pg]) fns[pg]();
+  checkStreak();
+}
+
+function renderHome(){
+  // Update start button based on whether user already has a name
+  const sb=document.getElementById('startBtn');
+  const hb=document.getElementById('heroStartBtn');
+  if(sb) sb.onclick=()=>go(ST.name?'dashboard':'onboard');
+  if(hb) hb.onclick=()=>go(ST.name?'dashboard':'onboard');
+}
+
+function checkStreak(){
+  const t=new Date().toDateString();
+  if(ST.lastDate&&ST.lastDate!==t){const y=new Date(Date.now()-86400000).toDateString();if(ST.lastDate!==y)ST.streak=1;else ST.streak++;}
+  ST.lastDate=new Date().toDateString();save();
+  const hs=document.getElementById('hStreak'),hx=document.getElementById('hXP');
+  if(hs)hs.textContent='🔥'+ST.streak;if(hx)hx.textContent='⭐'+ST.xp;
+}
+
+// ── ONBOARD ────────────────────────────────────────────────────────────────────
+function renderOnboard(){
+  const lg=document.getElementById('lvlGrid');if(!lg)return;lg.innerHTML='';
+  let selLv='beginner';
+  [['🌱','Beginner','Just starting'],['🌿','Elementary','Know basics'],['🌳','Intermediate','Conversational'],['🏔','Advanced','Near-fluent']].forEach(([e,l,d])=>{
+    const b=document.createElement('button');
+    b.style.cssText=`padding:11px;border-radius:11px;border:1px solid ${selLv===l.toLowerCase()?'#6c47ff':'rgba(255,255,255,.08)'};background:${selLv===l.toLowerCase()?'rgba(108,71,255,.15)':'transparent'};color:${selLv===l.toLowerCase()?'#a78bfa':'#5a6175'};font-size:12px;cursor:pointer;text-align:left;font-family:inherit`;
+    b.innerHTML=`<span style="display:block;font-size:16px;margin-bottom:3px">${e}</span><strong>${l}</strong><div style="font-size:10px;opacity:.6;margin-top:1px">${d}</div>`;
+    b.onclick=()=>{selLv=l.toLowerCase();lg.querySelectorAll('button').forEach(x=>{x.style.border='1px solid rgba(255,255,255,.08)';x.style.background='transparent';x.style.color='#5a6175';});b.style.border='1px solid #6c47ff';b.style.background='rgba(108,71,255,.15)';b.style.color='#a78bfa';};
+    lg.appendChild(b);
+  });
+  window.doOnboard=function(){ST.name=document.getElementById('nameIn')?.value?.trim()||'Learner';ST.level=selLv;save();go('dashboard');};
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────────
+function renderDash(){
+  const el=document.getElementById('dashBody');if(!el)return;
+  const next=ALL.find(l=>!ST.done.includes(l.id));
+  el.innerHTML=`
+    <div style="margin-bottom:22px"><h2 style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Good day, ${ST.name||'Learner'} 👋</h2><div style="color:var(--mu);font-size:13px">Keep your streak alive — just 10 minutes today</div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px">
+      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:#6c47ff">${ST.xp}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Total XP</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--am)">🔥${ST.streak}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Day streak</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--g)">${ST.done.length}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Lessons done</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--cy)">${ST.signs.length}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Signs learned</div></div>
+    </div>
+    <div style="background:linear-gradient(135deg,rgba(108,71,255,.15),rgba(255,71,145,.08));border:1px solid rgba(108,71,255,.25);border-radius:16px;padding:18px 20px;margin-bottom:22px;display:flex;align-items:center;gap:16px">
+      <div style="font-size:44px">${DAILY.e}</div>
+      <div style="flex:1"><div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:.5px;margin-bottom:4px">⚡ SIGN OF THE DAY</div><div style="font-size:16px;font-weight:800;margin-bottom:3px">${DAILY.w}</div><div style="font-size:12px;color:var(--mu);line-height:1.5">${DAILY.d}</div><div style="font-size:11px;color:var(--mu);margin-top:5px;font-style:italic">${DAILY.fact}</div></div>
+      <button class="btn-p" style="padding:9px 18px;font-size:12px;flex-shrink:0" onclick="go('tutor')">Practice with AI</button>
+    </div>
+    ${next?`<div style="margin-bottom:22px"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Continue Learning</div><div style="background:var(--s2);border:1px solid ${next.col}44;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer" onclick="startLesson('${next.id}')"><div style="width:46px;height:46px;border-radius:12px;background:${next.col}22;border:1px solid ${next.col}44;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${next.signs[0]?.e||'📚'}</div><div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:2px">${next.title}</div><div style="font-size:12px;color:var(--mu)">${next.ct} · ${next.xp} XP · ${next.signs.length} signs</div></div><div style="padding:7px 16px;background:${next.col};border-radius:9px;color:#fff;font-size:12px;font-weight:700">Continue →</div></div></div>`:'<div style="text-align:center;padding:20px;color:var(--g);font-size:14px;font-weight:700">🎉 All lessons complete! Amazing work!</div>'}
+    <div style="margin-bottom:22px"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Curriculum</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">${CUR.map(c=>{const done=c.lessons.filter(l=>ST.done.includes(l.id)).length;const p=Math.round((done/c.lessons.length)*100);return`<div style="background:var(--s2);border:1px solid ${c.color}30;border-radius:12px;padding:14px;cursor:pointer" onclick="go('lessons')"><div style="font-size:22px;margin-bottom:7px">${c.icon}</div><div style="font-size:13px;font-weight:700;margin-bottom:3px">${c.title}</div><div style="font-size:11px;color:var(--mu);margin-bottom:7px">${done}/${c.lessons.length} lessons</div><div class="pbar"><div class="pfill" style="width:${p}%;background:${c.color}"></div></div></div>`;}).join('')}</div></div>
+    ${ST.signs.length?`<div><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">Signs You Know (${ST.signs.length})</div><div style="display:flex;flex-wrap:wrap;gap:6px">${ST.signs.slice(-24).map(s=>`<span style="padding:3px 11px;border-radius:20px;background:rgba(108,71,255,.12);border:1px solid rgba(108,71,255,.25);font-size:11px;font-weight:700;color:#a78bfa">${s.e} ${s.w}</span>`).join('')}</div></div>`:''}
+  `;
+  checkStreak();
+}
+
+// ── LESSONS ───────────────────────────────────────────────────────────────────
+function renderLessons(){
+  const el=document.getElementById('lessonsBody');if(!el)return;
+  el.innerHTML=`<h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:20px">All Lessons (${ALL.length} total)</h2>`+CUR.map(c=>`
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:20px">${c.icon}</span>
+        <div><div style="font-size:14px;font-weight:700">${c.title}</div><div style="font-size:11px;color:var(--mu)">${c.lessons.filter(l=>ST.done.includes(l.id)).length}/${c.lessons.length} complete</div></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+        ${c.lessons.map(l=>{const done=ST.done.includes(l.id);return`<div style="background:var(--s2);border:1px solid ${done?c.color+'55':'rgba(255,255,255,.07)'};border-radius:12px;padding:14px;cursor:pointer;position:relative" onclick="startLesson('${l.id}')">${done?`<div style="position:absolute;top:10px;right:10px;background:${c.color};color:#fff;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700">✓ DONE</div>`:''}<div style="font-size:26px;margin-bottom:7px">${l.signs[0]?.e||'📚'}</div><div style="font-size:13px;font-weight:700;margin-bottom:2px">${l.title}</div><div style="font-size:11px;color:var(--mu);margin-bottom:7px">${l.desc}</div><div style="font-size:11px;color:${c.color};font-weight:600">+${l.xp} XP · ${l.signs.length} signs</div></div>`;}).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function startLesson(id){curLesson=ALL.find(l=>l.id===id);lessonStep=0;go('lesson');}
+
+// ── LESSON VIEW ───────────────────────────────────────────────────────────────
+function renderLesson(){
+  const el=document.getElementById('lessonBody');if(!el||!curLesson)return;
+  const l=curLesson;const total=l.signs.length;const inQuiz=lessonStep>=total;
+  const prog=Math.round(Math.min(lessonStep/total,1)*100);
+  let html=`<div style="display:flex;align-items:center;gap:12px;margin-bottom:20px"><button onclick="go('lessons')" style="background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:9px;color:var(--mu);padding:6px 12px;font-size:12px">←</button><div style="flex:1"><div style="font-size:12px;color:var(--mu);margin-bottom:5px">${l.ct} · ${l.title}</div><div class="pbar"><div class="pfill" style="width:${prog}%;background:${l.col}"></div></div></div><span style="font-size:12px;font-weight:700;color:var(--am)">+${l.xp} XP</span></div>`;
+  if(!inQuiz){
+    const s=l.signs[lessonStep];
+    html+=`<div style="background:var(--s2);border:2px solid ${l.col}44;border-radius:20px;padding:36px 28px;text-align:center;margin-bottom:18px;animation:pop .3s ease both"><div style="font-size:80px;margin-bottom:16px">${s.e}</div><h2 style="font-size:28px;font-weight:900;letter-spacing:-.5px;margin-bottom:10px;color:${l.col}">${s.w}</h2><div style="font-size:14px;color:var(--mu);line-height:1.7;max-width:340px;margin:0 auto">${s.d}</div><div style="margin-top:16px;padding:10px 16px;background:rgba(255,255,255,.04);border-radius:10px;font-size:12px;color:var(--mu);line-height:1.6">📌 Say "<strong style="color:var(--tx)">${s.w}</strong>" aloud as you form the sign. Repeat 5 times.</div></div>`;
+    html+=`<div style="text-align:center;font-size:12px;color:var(--mu);margin-bottom:16px">Sign ${lessonStep+1} of ${total}</div>`;
+    html+=`<div style="display:flex;gap:10px;justify-content:center">${lessonStep>0?`<button class="btn-o" onclick="lessonStep--;renderLesson()">← Previous</button>`:''}<button class="btn-p" style="background:${l.col}" onclick="lessonStep++;renderLesson()">${lessonStep<total-1?'Next Sign →':'Take Quiz ⚡'}</button></div>`;
+  } else {
+    const q=l.quiz;
+    html+=`<div style="background:var(--s2);border:1px solid rgba(108,71,255,.25);border-radius:16px;padding:24px"><div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:.5px;margin-bottom:10px">⚡ KNOWLEDGE CHECK</div><div style="font-size:17px;font-weight:700;margin-bottom:18px;line-height:1.5">${q.q}</div><div id="quizOpts">${q.opts.map((o,i)=>`<button onclick="answerQuiz(${i},${q.a},'${l.id}',${l.xp})" style="display:block;width:100%;padding:12px 18px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--tx);font-size:13px;cursor:pointer;text-align:left;margin-bottom:9px;font-family:inherit;transition:all .2s">${['A','B','C','D'][i]}. ${o}</button>`).join('')}</div></div>`;
+  }
+  el.innerHTML=html;
+}
+
+function answerQuiz(chosen,correct,lid,xpAmt){
+  const opts=document.querySelectorAll('#quizOpts button');
+  opts.forEach((b,i)=>{b.onclick=null;b.style.cursor='default';if(i===correct){b.style.border='1px solid #22c55e';b.style.background='rgba(34,197,94,.12)';b.style.color='#4ade80';}else if(i===chosen&&chosen!==correct){b.style.border='1px solid #ef4444';b.style.background='rgba(239,68,68,.12)';b.style.color='#f87171';}});
+  const ok=chosen===correct;
+  const fb=document.createElement('div');
+  fb.style.cssText=`margin-top:14px;padding:12px 16px;background:${ok?'rgba(34,197,94,.1)':'rgba(239,68,68,.1)'};border:1px solid ${ok?'rgba(34,197,94,.3)':'rgba(239,68,68,.3)'};border-radius:12px;font-size:13px;color:${ok?'#4ade80':'#f87171'}`;
+  fb.textContent=ok?'🎉 Correct! Well done!':"Not quite — but you'll get it next time!";
+  document.querySelector('#quizOpts').after(fb);
+  const cb=document.createElement('button');
+  cb.className='btn-p';cb.style.cssText=`margin-top:14px;width:100%;background:${curLesson?.col||'#6c47ff'}`;
+  cb.textContent=`✅ Complete Lesson +${xpAmt} XP`;
+  cb.onclick=()=>{markDone(lid,curLesson?.signs||[],xpAmt);go('dashboard');};
+  fb.after(cb);
+}
+
+// ── AI TUTOR ───────────────────────────────────────────────────────────────────
+function renderTutor(){
+  const sb=document.getElementById('tutorSidebar');if(!sb)return;sb.innerHTML='';
+  const lbl=(t)=>{const d=document.createElement('div');d.style.cssText='font-size:9px;font-weight:700;letter-spacing:1.5px;color:var(--mu);padding:10px 2px 5px;text-transform:uppercase';d.textContent=t;return d;};
+  sb.appendChild(lbl('LANGUAGE'));
+  ['ASL','BSL','ISL','Auslan','JSL','LSF'].forEach(lg=>{
+    const b=document.createElement('button');
+    b.style.cssText=`width:100%;padding:7px 10px;border-radius:8px;border:1px solid ${ST.chatLang===lg?'#6c47ff':'transparent'};background:${ST.chatLang===lg?'rgba(108,71,255,.12)':'transparent'};color:${ST.chatLang===lg?'#a78bfa':'var(--mu)'};font-size:12px;cursor:pointer;text-align:left;font-family:inherit;font-weight:${ST.chatLang===lg?700:400};margin-bottom:2px`;
+    b.textContent=lg;b.onclick=()=>{ST.chatLang=lg;save();renderTutor();};sb.appendChild(b);
+  });
+  sb.appendChild(lbl('MODE'));
+  [{id:'chat',l:'💬 Free Chat'},{id:'lesson',l:'📚 Lesson'},{id:'quiz',l:'⚡ Quiz'},{id:'story',l:'📖 Story'}].forEach(({id,l})=>{
+    const b=document.createElement('button');
+    b.style.cssText=`width:100%;padding:7px 10px;border-radius:8px;border:1px solid ${ST.chatMode===id?'#6c47ff':'transparent'};background:${ST.chatMode===id?'rgba(108,71,255,.12)':'transparent'};color:${ST.chatMode===id?'#a78bfa':'var(--mu)'};font-size:12px;cursor:pointer;text-align:left;font-family:inherit;font-weight:${ST.chatMode===id?700:400};margin-bottom:2px`;
+    b.textContent=l;b.onclick=()=>{ST.chatMode=id;save();renderTutor();};sb.appendChild(b);
+  });
+  sb.appendChild(lbl('QUICK PROMPTS'));
+  ['Teach me hello','Give me a quiz','Practice alphabet','Emergency signs','Sign of the day'].forEach(p=>{
+    const b=document.createElement('button');
+    b.style.cssText='width:100%;padding:7px 10px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:transparent;color:var(--mu);font-size:11px;cursor:pointer;text-align:left;font-family:inherit;margin-bottom:2px;transition:all .15s';
+    b.textContent=p;
+    b.onmouseenter=()=>{b.style.borderColor='#6c47ff';b.style.color='#a78bfa';};
+    b.onmouseleave=()=>{b.style.borderColor='rgba(255,255,255,.06)';b.style.color='var(--mu)';};
+    b.onclick=()=>sendChatMsg(p);sb.appendChild(b);
+  });
+  const msgs=document.getElementById('chatMsgs');if(!msgs)return;msgs.innerHTML='';
+  if(ST.chat.length===0){addBubble({role:'assistant',content:`👋 Hi ${ST.name||'there'}! I'm your ${ST.chatLang} tutor. Mode: ${ST.chatMode}. What would you like to learn?`});}
+  else{ST.chat.forEach(m=>addBubble(m));}
+  msgs.scrollTop=msgs.scrollHeight;
+  const inp=document.getElementById('chatIn');
+  if(inp){inp.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChatMsg(inp.value);}};}
+  const sp=document.getElementById('signsPanel');
+  if(sp){sp.innerHTML=ST.signs.slice(-5).reverse().map(s=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:5px"><span style="font-size:18px">${s.e}</span><div><div style="font-size:11px;font-weight:700;color:#a78bfa">${s.w}</div><div style="font-size:10px;color:var(--mu)">${s.d}</div></div></div>`).join('')||'<div style="font-size:11px;color:var(--mu)">Signs appear here as you learn</div>';}
+}
+
+function addBubble(m){
+  const msgs=document.getElementById('chatMsgs');if(!msgs)return;
+  const wrap=document.createElement('div');
+  wrap.style.cssText=`display:flex;flex-direction:column;align-items:${m.role==='user'?'flex-end':'flex-start'}`;
+  if(m.role==='assistant'){const lbl=document.createElement('div');lbl.style.cssText='display:flex;align-items:center;gap:5px;margin-bottom:4px';lbl.innerHTML='<div style="width:20px;height:20px;border-radius:50%;background:rgba(108,71,255,.3);display:flex;align-items:center;justify-content:center;font-size:10px">🤟</div><span style="font-size:10px;font-weight:700;color:#6c47ff">SignWorld Tutor</span>';wrap.appendChild(lbl);}
+  const bub=document.createElement('div');
+  bub.style.cssText=`max-width:75%;padding:10px 14px;font-size:13px;line-height:1.7;background:${m.role==='user'?'linear-gradient(135deg,#6c47ff,#ff4791)':'rgba(255,255,255,.05)'};border:${m.role==='user'?'none':'1px solid rgba(255,255,255,.08)'};border-radius:${m.role==='user'?'14px 4px 14px 14px':'4px 14px 14px 14px'};color:#e8eaf0`;
+  bub.textContent=m.content;wrap.appendChild(bub);
+  if(m.signs?.length){const sr=document.createElement('div');sr.style.cssText='display:flex;gap:7px;flex-wrap:wrap;margin-top:7px;max-width:75%';m.signs.forEach(s=>{const sc=document.createElement('div');sc.style.cssText='padding:6px 11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;display:flex;align-items:center;gap:6px';sc.innerHTML=`<span style="font-size:18px">${s.emoji||s.e}</span><div><div style="font-size:11px;font-weight:700;color:#a78bfa">${s.word||s.w}</div><div style="font-size:10px;color:var(--mu)">${s.desc||s.d}</div></div>`;sr.appendChild(sc);});wrap.appendChild(sr);}
+  msgs.appendChild(wrap);msgs.scrollTop=msgs.scrollHeight;
+}
+
+async function sendChatMsg(text){
+  text=text?.trim();if(!text)return;
+  const inp=document.getElementById('chatIn');
+  const sb2=document.getElementById('sendBtn');
+
+  // ── Spam guard: block if already waiting ──────────────────────────────────
+  if(sb2?.disabled)return;
+
+  if(inp)inp.value='';
+  if(sb2){sb2.textContent='…';sb2.disabled=true;}
+
+  const um={role:'user',content:text};
+  ST.chat.push(um);addBubble(um);
+
+  // Typing dots
+  const msgs=document.getElementById('chatMsgs');
+  const dot=document.createElement('div');
+  dot.style.cssText='display:flex;gap:4px;padding:10px 14px;background:rgba(108,71,255,.09);border:1px solid rgba(108,71,255,.18);border-radius:4px 14px 14px 14px;width:fit-content;align-items:center';
+  [0,1,2].forEach(i=>{const d=document.createElement('div');d.style.cssText=`width:6px;height:6px;border-radius:50%;background:#6c47ff;animation:bounce2 1.2s infinite;animation-delay:${i*.2}s`;dot.appendChild(d);});
+  msgs.appendChild(dot);msgs.scrollTop=msgs.scrollHeight;
+
+  // ── 10-second timeout via AbortController ─────────────────────────────────
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
+
+  try{
+    const hist=ST.chat.slice(-8).map(m=>({role:m.role,content:m.content}));
+    const res=await fetch('/api/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      signal:controller.signal,
+      body:JSON.stringify({messages:hist,chatLang:ST.chatLang,chatMode:ST.chatMode})
+    });
+    clearTimeout(timer);
+
+    if(res.status===429){throw new Error('Sending too fast — wait a second and try again.');}
+    if(!res.ok){
+      const err=await res.json().catch(()=>({}));
+      throw new Error(err.error||`Server error ${res.status}`);
+    }
+
+    const data=await res.json();
+    const raw=data?.content?.[0]?.text||'';
+    dot.remove();
+
+    // ── XML parsing with plain-text fallback ─────────────────────────────────
+    let reply;
+    if(raw.includes('<reply>')){
+      reply=raw.match(/<reply>([\s\S]*?)<\/reply>/)?.[1]?.trim()||'';
+    }
+    if(!reply) reply=raw.replace(/<[^>]+>/g,'').trim()||'Let me help you practice that sign!';
+
+    let fb=[];
+    try{fb=JSON.parse(raw.match(/<feedback>([\s\S]*?)<\/feedback>/)?.[1]||'[]');}catch{}
+
+    let signs=[];
+    try{signs=JSON.parse(raw.match(/<signs>([\s\S]*?)<\/signs>/)?.[1]||'[]');}catch{}
+
+    const am={role:'assistant',content:reply,signs};
+    ST.chat.push({role:'assistant',content:reply,signs});
+    addBubble(am);
+
+    signs.forEach(s=>{
+      const sw=s.word||s.w;
+      if(sw&&!ST.signs.some(x=>x.w===sw)){
+        ST.signs.push({e:s.emoji||'🤟',w:sw,d:s.desc||''});
+        ST.xp+=5;
+      }
+    });
+    save();
+
+    const fp=document.getElementById('feedPanel');
+    if(fp&&fb.length){
+      fp.innerHTML=fb.map(f=>`<div style="padding:8px 10px;background:${f.type==='good'?'rgba(34,197,94,.1)':f.type==='warn'?'rgba(245,158,11,.1)':'rgba(108,71,255,.1)'};border:1px solid ${f.type==='good'?'rgba(34,197,94,.25)':f.type==='warn'?'rgba(245,158,11,.25)':'rgba(108,71,255,.25)'};border-radius:9px;margin-bottom:6px;font-size:11px;color:${f.type==='good'?'#4ade80':f.type==='warn'?'#fcd34d':'#c4b5fd'};line-height:1.5">${f.text}</div>`).join('');
+    }
+
+    const sp=document.getElementById('signsPanel');
+    if(sp){
+      sp.innerHTML=ST.signs.slice(-5).reverse().map(s=>`<div style="display:flex;align-items:center;gap:7px;padding:6px 8px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:5px"><span style="font-size:18px">${s.e}</span><div><div style="font-size:11px;font-weight:700;color:#a78bfa">${s.w}</div><div style="font-size:10px;color:var(--mu)">${s.d}</div></div></div>`).join('');
+    }
+
+  }catch(e){
+    clearTimeout(timer);
+    dot.remove();
+    const msg=
+      e.name==='AbortError'         ? 'Request timed out — check your connection.' :
+      e.message?.includes('fetch')  ? 'Could not reach server — are you on Vercel?' :
+      e.message || 'Something went wrong. Try again.';
+    addBubble({role:'assistant',content:msg});
+  }
+
+  if(sb2){sb2.textContent='Send';sb2.disabled=false;}
+  if(inp)inp.focus();
+}
+window.sendChat=()=>{sendChatMsg(document.getElementById('chatIn')?.value);};
+
+// ── PROGRESS ──────────────────────────────────────────────────────────────────
+function renderProg(){
+  const el=document.getElementById('progBody');if(!el)return;
+  const op=Math.round((ST.done.length/ALL.length)*100)||0;
+  const rings=[{l:'Overall',v:op,c:'#6c47ff'},{l:'Vocabulary',v:Math.min(ST.signs.length*3,100),c:'#06b6d4'},{l:'XP Level',v:Math.min(ST.xp/5,100),c:'#f59e0b'},{l:'Streak',v:Math.min(ST.streak*14,100),c:'#22c55e'}];
+  el.innerHTML=`<h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:20px">Your Progress</h2>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px">
+      ${rings.map(({l,v,c})=>{const vv=Math.round(v);const r=26;const circ=2*Math.PI*r;const off=circ-(circ*vv/100);return`<div class="card" style="text-align:center"><svg width="64" height="64" style="transform:rotate(-90deg);margin-bottom:6px"><circle cx="32" cy="32" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="6"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="${c}" stroke-width="6" stroke-dasharray="${circ}" stroke-dashoffset="${off}" stroke-linecap="round"/></svg><div style="font-size:11px;color:var(--mu)">${l}</div><div style="font-size:16px;font-weight:800;color:${c};margin-top:2px">${vv}%</div></div>`;}).join('')}
+    </div>
+    <div style="margin-bottom:24px"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:14px">Chapter Progress</div>
+      ${CUR.map(c=>{const done=c.lessons.filter(l=>ST.done.includes(l.id)).length;const p=Math.round((done/c.lessons.length)*100);return`<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><span style="font-size:13px;font-weight:600">${c.icon} ${c.title}</span><span style="font-size:12px;font-weight:700;color:${c.color}">${done}/${c.lessons.length} · ${p}%</span></div><div class="pbar"><div class="pfill" style="width:${p}%;background:${c.color}"></div></div></div>`;}).join('')}
+    </div>
+    ${ST.journal.length?`<div><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Learning Journal</div>${ST.journal.slice(-8).reverse().map(e=>`<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:12px 16px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600;margin-bottom:2px">${e.lesson}</div><div style="font-size:11px;color:var(--mu)">${e.date}</div></div><div style="display:flex;gap:10px"><span style="font-size:12px;color:var(--am);font-weight:700">+${e.xp} XP</span><span style="font-size:12px;color:var(--cy);font-weight:700">${e.signs} signs</span></div></div>`).join('')}</div>`:''}`;
+}
+
+// ── SHARE ─────────────────────────────────────────────────────────────────────
+function renderShare(){
+  const el=document.getElementById('shareBody');if(!el)return;
+  const msgs=[
+    `I just learned ${ST.signs.length} signs in sign language on SignWorld! 🤟 466 million deaf people deserve to be heard. Join me → signworld.app`,
+    `Day ${ST.streak} of learning ${ST.chatLang||'ASL'}! Completed ${ST.done.length} lessons and earned ${ST.xp} XP. Learn for free → signworld.app 🤟`,
+    `Sign language connects us. I've learned ${ST.signs.length} signs so far. Try SignWorld free → signworld.app #SignLanguage #Accessibility`
+  ];
+  el.innerHTML=`<h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">Share Your Progress</h2><p style="color:var(--mu);font-size:13px;margin-bottom:26px">Let the world know you're learning sign language</p>
+    <div style="background:linear-gradient(135deg,#131720,#1a1f2e);border:1px solid rgba(108,71,255,.3);border-radius:20px;padding:32px;margin-bottom:24px">
+      <div style="font-size:36px;margin-bottom:12px">🤟</div>
+      <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px;background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SignWorld Learner</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:20px">${ST.name||'Anonymous'} · ${new Date().toLocaleDateString()}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">🏆</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.xp}</div><div style="font-size:11px;color:var(--mu)">Total XP</div></div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">📚</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.done.length}</div><div style="font-size:11px;color:var(--mu)">Lessons</div></div>
+        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">🤟</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.signs.length}</div><div style="font-size:11px;color:var(--mu)">Signs</div></div>
+      </div>
+      <div style="font-size:13px;color:#a78bfa;font-weight:600">signworld.app · Learn sign language free 🌍</div>
+    </div>
+    ${['LinkedIn','Twitter/X','WhatsApp'].map((pl,i)=>`<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px;text-align:left"><div style="font-size:12px;color:var(--mu);margin-bottom:8px">${pl}</div><div style="font-size:13px;color:var(--tx);line-height:1.6;margin-bottom:10px">${msgs[i]}</div><button id="cp${i}" onclick="copyMsg(${i},'cp${i}')" style="padding:6px 14px;background:rgba(108,71,255,.15);border:1px solid rgba(108,71,255,.3);border-radius:8px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button></div>`).join('')}
+    <div style="margin-top:18px;padding:14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;font-size:13px;color:#4ade80">🎯 Every share brings awareness to the deaf community. Thank you for spreading inclusion.</div>`;
+  window.copyMsg=(i,btnId)=>{navigator.clipboard?.writeText(msgs[i]).catch(()=>{});const b=document.getElementById(btnId);if(b){b.textContent='Copied! ✓';setTimeout(()=>b.textContent='Copy',2000);}};
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderOnboard();
+go(ST.name?'dashboard':'home');
+</script>
+</body>
+</html>

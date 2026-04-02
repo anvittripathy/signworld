@@ -1,0 +1,16 @@
+{
+  "name": "signworld",
+  "version": "1.0.0",
+  "description": "SignWorld — Learn Sign Language Free",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "devDependencies": {
+    "vercel": "^37.0.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
