@@ -12,7 +12,8 @@ const ALLOWED_ORIGINS = [
 ];
 
 export default async function handler(req, res) {
-
+  res.status(200).json({ message: "ok" });
+}
   // ── CORS ──────────────────────────────────────────────────────────────────
   const origin = req.headers.origin || '';
   const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
