@@ -334,15 +334,32 @@ const ALL=CUR.flatMap(c=>c.lessons.map(l=>({...l,cc:c.id,ct:c.title,col:c.color}
 const DAILY={e:'🌟',w:'Learn',d:'Open hand to forehead, then close like grabbing knowledge',fact:'466 million deaf people worldwide need sign language communicators.'};
 
 // ─────────────────────────────────────────────────────────────────────────────
-// STATE
+// STATE  (versioned + validated)
 // ─────────────────────────────────────────────────────────────────────────────
-let ST=JSON.parse(localStorage.getItem('sw5')||'null')||{name:'',level:'beginner',done:[],xp:0,streak:1,lastDate:null,signs:[],journal:[]};
-function save(){try{localStorage.setItem('sw5',JSON.stringify(ST));}catch{}}
-function addXP(n){ST.xp+=n;save();}
+const STATE_DEFAULTS={v:2,name:'',level:'beginner',done:[],xp:0,streak:1,lastDate:null,signs:[],journal:[]};
+function loadState(){
+  try{
+    const raw=localStorage.getItem('sw5');
+    if(!raw)return{...STATE_DEFAULTS};
+    const parsed=JSON.parse(raw);
+    if(!parsed||typeof parsed!=='object')return{...STATE_DEFAULTS};
+    const s={...STATE_DEFAULTS,...parsed,v:2};
+    if(!Array.isArray(s.done))s.done=[];
+    if(!Array.isArray(s.signs))s.signs=[];
+    if(!Array.isArray(s.journal))s.journal=[];
+    if(typeof s.xp!=='number'||isNaN(s.xp))s.xp=0;
+    if(typeof s.streak!=='number'||isNaN(s.streak))s.streak=1;
+    if(typeof s.name!=='string')s.name='';
+    return s;
+  }catch{return{...STATE_DEFAULTS};}
+}
+let ST=loadState();
+function save(){try{localStorage.setItem('sw5',JSON.stringify(ST));}catch(e){console.warn('Save failed',e);}}
+function addXP(n){ST.xp=Math.max(0,(ST.xp||0)+n);save();}
 function markDone(id,signs,xpAmt){
   if(!ST.done.includes(id)){
     ST.done.push(id);addXP(xpAmt);
-    signs.forEach(s=>{if(!ST.signs.some(x=>x.w===s.w))ST.signs.push(s);});
+    signs.forEach(s=>{if(s.w&&!ST.signs.some(x=>x.w===s.w))ST.signs.push(s);});
     ST.journal.push({date:new Date().toLocaleDateString(),lesson:ALL.find(l=>l.id===id)?.title||id,xp:xpAmt,signs:signs.length});
     save();
   }
@@ -354,7 +371,7 @@ let curLesson=null, lessonStep=0, lessonSignsDone=new Set();
 // Camera / MediaPipe state
 let mpHands=null, mpCamera=null, mpReady=false, camActive=false;
 let matchHoldFrames=0;
-const HOLD_NEEDED=15;
+const HOLD_NEEDED=10; // ~0.4s at 24fps — feels responsive
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROUTING
@@ -565,7 +582,7 @@ function renderLesson(){
 
 function switchLessonSign(idx){
   if(idx>=curLesson.signs.length){lessonStep=curLesson.signs.length;renderLesson();return;}
-  lessonStep=idx;matchHoldFrames=0;renderLesson();
+  lessonStep=idx;matchHoldFrames=0;clearSmooth();renderLesson();
 }
 
 function skipSign(){
@@ -626,15 +643,92 @@ function updateFingers(states,target){
   });
 }
 
-// Detect finger extended/curled from MediaPipe landmarks
-function getFingers(lm){
-  const tips=[4,8,12,16,20],bases=[2,5,9,13,17];
-  return tips.map((tip,i)=>{
-    if(i===0){// thumb: x distance from index base
-      return Math.abs(lm[tip].x-lm[5].x)>0.08;
+// ─────────────────────────────────────────────────────────────────────────────
+// DETECTION ENGINE  (robust — smoothed, angle-compensated, tolerance-based)
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Rolling buffer for temporal smoothing — reduces flickering from single-frame noise
+const SMOOTH_FRAMES=5;
+const fingerBuffer=[[], [], [], [], []]; // one ring buffer per finger
+
+function pushSmooth(finger, value){
+  fingerBuffer[finger].push(value);
+  if(fingerBuffer[finger].length>SMOOTH_FRAMES)fingerBuffer[finger].shift();
+  // Return smoothed value: extended if majority of recent frames say extended
+  const ext=fingerBuffer[finger].filter(Boolean).length;
+  return ext > fingerBuffer[finger].length/2;
+}
+
+function clearSmooth(){fingerBuffer.forEach(b=>b.length=0);}
+
+// Distance between two landmarks
+function dist(a,b){return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2+(a.z-b.z)**2);}
+
+// Detect hand orientation — palm facing camera or away
+// Uses cross-product of wrist→index_base and wrist→pinky_base
+function isHandFacingCamera(lm){
+  const w=lm[0],ib=lm[5],pb=lm[17];
+  const ax=ib.x-w.x, ay=ib.y-w.y;
+  const bx=pb.x-w.x, by=pb.y-w.y;
+  return (ax*by - ay*bx) > 0; // positive = palm toward camera
+}
+
+// Compute hand scale — normalises thresholds to hand size
+// so detection works whether hand is close or far from camera
+function handScale(lm){
+  return dist(lm[0],lm[9])||0.1; // wrist to middle MCP
+}
+
+// Core: determine if each finger is extended
+// Returns array of 5 raw booleans [thumb,index,middle,ring,pinky]
+function getRawFingers(lm){
+  const scale=handScale(lm);
+  const facing=isHandFacingCamera(lm);
+
+  // Finger tip, PIP, MCP landmark indices
+  const TIP=[4, 8,12,16,20];
+  const PIP=[3, 7,11,15,19]; // DIP for more accurate curl
+  const MCP=[2, 5, 9,13,17];
+
+  return TIP.map((tipIdx,i)=>{
+    if(i===0){
+      // Thumb: compare distance from thumb tip to index MCP
+      // vs thumb base to index MCP — extended if tip is farther away
+      const tipDist=dist(lm[tipIdx],lm[5]);
+      const baseDist=dist(lm[MCP[i]],lm[5]);
+      // Also consider lateral extension (x-axis distance)
+      const lateralDist=Math.abs(lm[tipIdx].x-lm[5].x);
+      return tipDist > baseDist*0.85 || lateralDist > scale*0.6;
     }
-    return lm[tip].y < lm[bases[i]+1].y; // tip above PIP
+    // Other fingers: tip above PIP in the finger's own coordinate space
+    // Use both y-axis and actual 3D distance for angle tolerance
+    const tipY=lm[tipIdx].y;
+    const pipY=lm[PIP[i]].y;
+    const mcpY=lm[MCP[i]].y;
+    // Straight-up: tip clearly above PIP
+    const yExtended=tipY < pipY - scale*0.05;
+    // Side/angled: tip farther from wrist than PIP
+    const dTip=dist(lm[tipIdx],lm[0]);
+    const dPip=dist(lm[PIP[i]],lm[0]);
+    const distExtended=dTip > dPip*1.08;
+    return yExtended || distExtended;
   });
+}
+
+// Smoothed finger states
+function getFingers(lm){
+  const raw=getRawFingers(lm);
+  return raw.map((v,i)=>pushSmooth(i,v));
+}
+
+// Weighted confidence — some fingers matter more for each sign
+// Returns 0-100 score
+function scoreSign(fingers, target){
+  if(!target)return 0;
+  // Fingers that are DIFFERENT from target get penalised
+  let score=0;
+  fingers.forEach((f,i)=>{ if(f===target[i])score+=20; });
+  return score; // 0,20,40,60,80,100
 }
 
 let fpsFrames=0,fpsTime=0;
@@ -648,7 +742,7 @@ function onHandResults(results){
   canvas.height=video.videoHeight||480;
   ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // FPS
+  // FPS counter
   fpsFrames++;
   const now=performance.now();
   if(now-fpsTime>1000){
@@ -659,10 +753,11 @@ function onHandResults(results){
 
   if(!results.multiHandLandmarks?.length){
     setCamStatus('detecting');
-    setFeedback('🖐','Show your hand to the camera — good lighting helps');
+    setFeedback('🖐','Show your hand to the camera — make sure there is good lighting');
     setConf(0);
     updateFingers([false,false,false,false,false],null);
     matchHoldFrames=0;
+    clearSmooth();
     ctx.restore();return;
   }
 
@@ -680,12 +775,11 @@ function onHandResults(results){
   setCamStatus('detecting');
 
   if(!target){
-    setFeedback('👋',`No detection needed for <b>${sign.w}</b> — practice the shape manually`);
+    setFeedback('👋',`No detection for <b>${sign.w}</b> — practise the shape manually`);
     return;
   }
 
-  const matches=fingers.filter((f,i)=>f===target[i]).length;
-  const pct=Math.round((matches/5)*100);
+  const pct=scoreSign(fingers,target);
   setConf(pct);
 
   if(pct===100){
@@ -694,6 +788,7 @@ function onHandResults(results){
     setFeedback('🎯',`<b>Perfect form!</b> Hold it... ${hp<100?hp+'%':'Done! ✓'}`,'good');
     if(matchHoldFrames>=HOLD_NEEDED&&!lessonSignsDone.has(lessonStep)){
       lessonSignsDone.add(lessonStep);
+      clearSmooth();
       const ring=document.getElementById('matchRing');
       if(ring){ring.classList.add('show');setTimeout(()=>ring.classList.remove('show'),700);}
       setFeedback('🎉',`<b>${sign.w}</b> mastered! Moving on...`,'good');
@@ -707,13 +802,14 @@ function onHandResults(results){
   } else if(pct>=80){
     matchHoldFrames=0;
     const wrong=fingers.map((f,i)=>f!==target[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
-    setFeedback('👍',`Almost! Fix your <b>${wrong.join(', ')}</b>`,'warn');
+    setFeedback('👍',`Almost! Adjust your <b>${wrong.join(', ')}</b>`,'warn');
   } else if(pct>=60){
     matchHoldFrames=0;
-    setFeedback('🤔',`${pct}% match — check the steps on the left`,'');
+    const wrong=fingers.map((f,i)=>f!==target[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
+    setFeedback('🤔',`Getting closer — fix <b>${wrong.join(', ')}</b> (${pct}% match)`);
   } else {
     matchHoldFrames=0;
-    setFeedback('👋',`Form the <b>${sign.w}</b> sign — follow the numbered steps`);
+    setFeedback('👋',`Form the <b>${sign.w}</b> sign — follow the numbered steps on the left`);
   }
 }
 
