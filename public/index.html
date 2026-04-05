@@ -4,9 +4,9 @@
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SignWorld — Learn Sign Language Free</title>
 <!-- MediaPipe -->
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',system-ui,sans-serif}
 :root{--bg:#080b14;--s1:#0d1118;--s2:#131720;--s3:#1a1f2e;--bd:rgba(255,255,255,0.07);--bd2:rgba(255,255,255,0.13);--tx:#e8eaf0;--mu:#5a6175;--ac:#6c47ff;--ac2:#ff4791;--g:#22c55e;--am:#f59e0b;--rd:#ef4444;--cy:#06b6d4}
@@ -36,6 +36,10 @@ nav{background:rgba(8,11,20,.97);border-bottom:1px solid var(--bd);padding:11px 
 .pill{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;border:1px solid}
 ::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:3px}
 input::placeholder{color:var(--mu)}
+@media(max-width:700px){
+  #pg-home .fade[style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}
+  #pg-home .fade[style*="grid-template-columns:1fr 1fr"] >div:last-child{display:none}
+}
 
 /* ── Lesson layout with camera ── */
 .lesson-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
@@ -55,6 +59,11 @@ input::placeholder{color:var(--mu)}
 .cam-overlay.gone{opacity:0;pointer-events:none}
 .match-ring{position:absolute;inset:0;border:3px solid var(--g);opacity:0;transition:opacity .3s;pointer-events:none;border-radius:0}
 .match-ring.show{opacity:1;animation:flashGreen .6s ease-out}
+.xp-pop{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);background:linear-gradient(135deg,#6c47ff,#22c55e);border-radius:20px;padding:20px 36px;text-align:center;z-index:9998;pointer-events:none;transition:none}
+.xp-pop.show{animation:xpBoom .7s cubic-bezier(.34,1.56,.64,1) forwards}
+.xp-pop.hide{animation:xpFade .3s ease forwards}
+@keyframes xpBoom{0%{transform:translate(-50%,-50%) scale(0);opacity:0}60%{transform:translate(-50%,-50%) scale(1.05);opacity:1}100%{transform:translate(-50%,-50%) scale(1);opacity:1}}
+@keyframes xpFade{to{transform:translate(-50%,-50%) scale(.8);opacity:0}}
 .cam-start-btn{padding:11px 24px;border-radius:11px;background:var(--ac);border:none;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit}
 .cam-start-btn:hover{background:#7c5cff}
 .cam-denied{display:none;padding:14px 16px;background:rgba(239,68,68,.08);border-top:1px solid rgba(239,68,68,.15);font-size:12px;color:#fca5a5;line-height:1.6}
@@ -117,32 +126,85 @@ input::placeholder{color:var(--mu)}
     <button class="nbtn hi" id="startBtn">Start Free →</button>
   </div>
 </nav>
-<div style="text-align:center;padding:64px 24px 52px;max-width:700px;margin:0 auto" class="fade">
-  <div style="font-size:15px;color:#a78bfa;font-weight:700;letter-spacing:.4px;margin-bottom:18px">🌍 466 million deaf people. Start communicating today.</div>
-  <h1 style="font-size:clamp(34px,7vw,64px);font-weight:900;letter-spacing:-2.5px;line-height:1.05;margin-bottom:18px">Learn sign language<br><span style="background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">in 10 minutes a day</span></h1>
-  <p style="font-size:17px;color:var(--mu);line-height:1.7;margin-bottom:34px">Structured lessons. Live hand detection. Real-time feedback.<br>The sign language app built for outcomes.</p>
-  <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:52px">
-    <button class="btn-p" style="font-size:16px;padding:15px 38px" id="heroStartBtn">🚀 Start Free — No Signup</button>
+
+<!-- HERO: two column — left copy, right live camera demo -->
+<div style="max-width:960px;margin:0 auto;padding:48px 24px;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center" class="fade">
+  <div>
+    <div style="font-size:12px;color:#a78bfa;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">🌍 466 million deaf people. Start communicating today.</div>
+    <h1 style="font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.1;margin-bottom:16px">The only way to<br>learn a sign is to<br><span style="background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">actually do it.</span></h1>
+    <p style="font-size:16px;color:var(--mu);line-height:1.7;margin-bottom:28px">Point your camera. Form the sign.<br>Get instant feedback. No account needed.</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px">
+      <button class="btn-p" style="font-size:15px;padding:13px 32px" id="heroStartBtn">🤟 Try your first sign →</button>
+    </div>
+    <div style="display:flex;gap:20px">
+      <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#a78bfa">466M</div><div style="font-size:10px;color:var(--mu)">Deaf worldwide</div></div>
+      <div style="width:1px;background:var(--bd)"></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#34d399">17</div><div style="font-size:10px;color:var(--mu)">Lessons</div></div>
+      <div style="width:1px;background:var(--bd)"></div>
+      <div style="text-align:center"><div style="font-size:20px;font-weight:900;color:#fb923c">Free</div><div style="font-size:10px;color:var(--mu)">Forever</div></div>
+    </div>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:16px;overflow:hidden;max-width:680px;margin:0 auto">
-    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)"><div style="font-size:26px;font-weight:900;color:#a78bfa;margin-bottom:4px">466M</div><div style="font-size:11px;color:var(--mu)">Deaf worldwide</div></div>
-    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)"><div style="font-size:26px;font-weight:900;color:#34d399;margin-bottom:4px">300+</div><div style="font-size:11px;color:var(--mu)">Sign languages</div></div>
-    <div style="padding:20px 14px;text-align:center;border-right:1px solid rgba(255,255,255,.07)"><div style="font-size:26px;font-weight:900;color:#f472b6;margin-bottom:4px">17</div><div style="font-size:11px;color:var(--mu)">Structured lessons</div></div>
-    <div style="padding:20px 14px;text-align:center"><div style="font-size:26px;font-weight:900;color:#fb923c;margin-bottom:4px">Free</div><div style="font-size:11px;color:var(--mu)">Forever core</div></div>
+
+  <!-- Live camera demo panel -->
+  <div style="background:var(--s2);border:1px solid rgba(108,71,255,.3);border-radius:20px;overflow:hidden;box-shadow:0 0 60px rgba(108,71,255,.15)">
+    <div style="padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="sdot" id="homeSdot"></span>
+        <span style="font-size:12px;font-weight:700" id="homeStatus">Try the ILY sign 🤟</span>
+      </div>
+      <span style="font-size:10px;color:var(--mu)" id="homeFps"></span>
+    </div>
+    <div style="position:relative;background:#000;aspect-ratio:4/3">
+      <video id="homeVideo" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block"></video>
+      <canvas id="homeCanvas" style="position:absolute;inset:0;width:100%;height:100%;transform:scaleX(-1)"></canvas>
+      <!-- Sign target overlay -->
+      <div style="position:absolute;top:10px;left:10px;background:rgba(8,11,20,.85);border:1px solid rgba(108,71,255,.3);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:8px">
+        <span style="font-size:28px">🤟</span>
+        <div><div style="font-size:11px;font-weight:700;color:#a78bfa">FORM THIS SIGN</div><div style="font-size:13px;font-weight:800">I Love You</div></div>
+      </div>
+      <div id="homeMatchFlash" style="position:absolute;inset:0;border:3px solid var(--g);opacity:0;pointer-events:none;transition:opacity .3s"></div>
+      <div id="homeCamOverlay" style="position:absolute;inset:0;background:rgba(8,11,20,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center">
+        <div style="font-size:48px">🤟</div>
+        <div style="font-size:14px;font-weight:700;color:var(--tx)">See it in action</div>
+        <div style="font-size:12px;color:var(--mu);line-height:1.6;max-width:220px">Enable camera to try the ILY sign live — your hand, real feedback</div>
+        <button onclick="startHomeCamera()" style="padding:10px 22px;background:var(--ac);border:none;border-radius:10px;color:#fff;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit">📷 Try it now</button>
+        <div style="font-size:10px;color:var(--mu)">Camera stays on your device</div>
+      </div>
+    </div>
+    <!-- Finger state display -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:10px 12px;border-top:1px solid var(--bd)" id="homeFingRow">
+      <div class="fing" id="hf0"><div class="fing-name">Thumb</div><div class="fing-icon" id="hfi0">—</div></div>
+      <div class="fing" id="hf1"><div class="fing-name">Index</div><div class="fing-icon" id="hfi1">—</div></div>
+      <div class="fing" id="hf2"><div class="fing-name">Middle</div><div class="fing-icon" id="hfi2">—</div></div>
+      <div class="fing" id="hf3"><div class="fing-name">Ring</div><div class="fing-icon" id="hfi3">—</div></div>
+      <div class="fing" id="hf4"><div class="fing-name">Pinky</div><div class="fing-icon" id="hfi4">—</div></div>
+    </div>
+    <div style="padding:10px 16px;border-top:1px solid var(--bd);background:rgba(108,71,255,.05)">
+      <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:8px">
+        <div id="homeConfBar" style="height:100%;border-radius:2px;background:var(--ac);width:0%;transition:width .25s,background .25s"></div>
+      </div>
+      <div style="font-size:11px;color:var(--mu)" id="homeConfTxt">Form the ILY sign to see detection in action</div>
+    </div>
   </div>
 </div>
-<div style="padding:0 24px 60px;max-width:900px;margin:0 auto">
-  <div style="text-align:center;margin-bottom:30px"><h2 style="font-size:28px;font-weight:800;letter-spacing:-.5px">Built for outcomes, not features</h2></div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:52px">
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px"><div style="font-size:28px;margin-bottom:10px">📚</div><div style="font-size:14px;font-weight:700;margin-bottom:5px">Structured Path</div><div style="font-size:12px;color:var(--mu);line-height:1.6">17 lessons across 5 chapters. A to Z, then real vocabulary.</div></div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px"><div style="font-size:28px;margin-bottom:10px">🖐</div><div style="font-size:14px;font-weight:700;margin-bottom:5px">Live Hand Detection</div><div style="font-size:12px;color:var(--mu);line-height:1.6">Webcam detects your hand shape in real time. Know instantly if you got it right.</div></div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px"><div style="font-size:28px;margin-bottom:10px">⚡</div><div style="font-size:14px;font-weight:700;margin-bottom:5px">Instant Feedback</div><div style="font-size:12px;color:var(--mu);line-height:1.6">Per-finger guidance — "extend your index finger" not just "try again".</div></div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:20px"><div style="font-size:28px;margin-bottom:10px">📊</div><div style="font-size:14px;font-weight:700;margin-bottom:5px">Track Progress</div><div style="font-size:12px;color:var(--mu);line-height:1.6">XP, streaks, skill rings — see exactly how far you've come.</div></div>
+
+<!-- Below fold: social proof + CTA -->
+<div style="max-width:960px;margin:0 auto;padding:0 24px 60px">
+  <div style="background:linear-gradient(135deg,rgba(108,71,255,.12),rgba(255,71,145,.07));border:1px solid rgba(108,71,255,.2);border-radius:20px;padding:40px 32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center;margin-bottom:24px">
+    <div>
+      <div style="font-size:36px;margin-bottom:14px">💬</div>
+      <blockquote style="font-size:18px;font-weight:700;line-height:1.5;margin-bottom:10px">"The moment a hearing person signs to me, I don't feel <span style="color:var(--ac)">invisible</span> anymore."</blockquote>
+      <div style="font-size:13px;color:var(--mu)">— A deaf student, 22, India</div>
+    </div>
+    <div style="display:grid;gap:12px">
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center"><div style="font-size:22px">🖐</div><div><div style="font-size:13px;font-weight:700">Real-time hand detection</div><div style="font-size:12px;color:var(--mu)">Camera reads your finger positions live</div></div></div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center"><div style="font-size:22px">⚡</div><div><div style="font-size:13px;font-weight:700">Per-finger feedback</div><div style="font-size:12px;color:var(--mu)">"Adjust your ring finger" — not just "wrong"</div></div></div>
+      <div style="background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;display:flex;gap:12px;align-items:center"><div style="font-size:22px">🔒</div><div><div style="font-size:13px;font-weight:700">Stays on your device</div><div style="font-size:12px;color:var(--mu)">Camera data never leaves your browser</div></div></div>
+    </div>
   </div>
-  <div style="background:linear-gradient(135deg,rgba(108,71,255,.12),rgba(255,71,145,.07));border:1px solid rgba(108,71,255,.2);border-radius:20px;padding:48px 24px;text-align:center">
-    <div style="font-size:36px;margin-bottom:14px">💬</div>
-    <blockquote style="font-size:20px;font-weight:700;line-height:1.4;margin-bottom:12px">"The moment a hearing person signs to me,<br>I don't feel <span style="color:var(--ac)">invisible</span> anymore."</blockquote>
-    <div style="font-size:13px;color:var(--mu)">— A deaf student, 22, India</div>
+  <div style="text-align:center">
+    <button class="btn-p" style="font-size:16px;padding:15px 40px" id="heroStartBtn2">Start learning — it's free →</button>
+    <div style="font-size:12px;color:var(--mu);margin-top:10px">No signup · No app download · Works in your browser</div>
   </div>
 </div>
 </div>
@@ -150,21 +212,47 @@ input::placeholder{color:var(--mu)}
 <!-- ───────── ONBOARD ───────── -->
 <div class="page" id="pg-onboard">
 <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px">
-  <div style="max-width:460px;width:100%" class="fade">
-    <div style="text-align:center;margin-bottom:28px">
-      <div style="font-size:48px;margin-bottom:12px">🤟</div>
-      <h1 style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Welcome to SignWorld</h1>
-      <p style="color:var(--mu);font-size:14px">Let's personalize your learning journey</p>
+  <div style="max-width:480px;width:100%" class="fade" id="obWrap">
+    <!-- Step dots -->
+    <div style="display:flex;gap:6px;justify-content:center;margin-bottom:32px" id="obDots">
+      <div id="od0" style="width:28px;height:4px;border-radius:2px;background:var(--ac);transition:all .3s"></div>
+      <div id="od1" style="width:8px;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:all .3s"></div>
+      <div id="od2" style="width:8px;height:4px;border-radius:2px;background:rgba(255,255,255,.1);transition:all .3s"></div>
     </div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px">What's your name?</div>
-      <input id="nameIn" placeholder="Your first name..." style="width:100%;padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;color:var(--tx);font-size:14px">
+    <div id="obStep0">
+      <!-- Step 0: Emotional hook -->
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="font-size:52px;margin-bottom:16px">🤟</div>
+        <h1 style="font-size:28px;font-weight:900;letter-spacing:-.5px;line-height:1.2;margin-bottom:12px">466 million people<br><span style="background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">are waiting to be heard</span></h1>
+        <p style="color:var(--mu);font-size:15px;line-height:1.7;max-width:360px;margin:0 auto">"The moment a hearing person signs to me, I don't feel invisible anymore." — A deaf student, 22</p>
+      </div>
+      <div style="background:rgba(108,71,255,.08);border:1px solid rgba(108,71,255,.2);border-radius:16px;padding:20px;margin-bottom:20px;text-align:center">
+        <div style="font-size:13px;color:var(--mu);margin-bottom:14px;font-weight:600">Why are you learning sign language?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="whyGrid"></div>
+      </div>
+      <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="obNext(1)">I'm in — let's start →</button>
     </div>
-    <div style="background:var(--s2);border:1px solid var(--bd);border-radius:16px;padding:20px;margin-bottom:14px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--mu);text-transform:uppercase;margin-bottom:12px">Your level</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="lvlGrid"></div>
+    <div id="obStep1" style="display:none">
+      <!-- Step 1: Name -->
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:40px;margin-bottom:12px">👋</div>
+        <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px">What should we call you?</h2>
+        <p style="color:var(--mu);font-size:13px">Your progress is saved locally — no account needed</p>
+      </div>
+      <input id="nameIn" placeholder="Your first name..." style="width:100%;padding:13px 16px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-size:16px;margin-bottom:14px;display:block">
+      <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="obNext(2)">Continue →</button>
+      <button style="width:100%;padding:10px;background:transparent;border:none;color:var(--mu);font-size:13px;cursor:pointer;margin-top:8px;font-family:inherit" onclick="obNext(2)">Skip</button>
     </div>
-    <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="doOnboard()">Begin My Journey →</button>
+    <div id="obStep2" style="display:none">
+      <!-- Step 2: Level -->
+      <div style="text-align:center;margin-bottom:28px">
+        <div style="font-size:40px;margin-bottom:12px">📊</div>
+        <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px">Your starting point?</h2>
+        <p style="color:var(--mu);font-size:13px">Honest answer helps us personalise your path</p>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px" id="lvlGrid"></div>
+      <button class="btn-p" style="width:100%;padding:14px;font-size:15px" onclick="doOnboard()">Start my first sign 🤟</button>
+    </div>
   </div>
 </div>
 </div>
@@ -228,79 +316,14 @@ input::placeholder{color:var(--mu)}
 // SIGN FINGER TARGETS
 // [thumb, index, middle, ring, pinky]  true=extended  false=curled
 // ─────────────────────────────────────────────────────────────────────────────
-const FINGER_TARGETS = {
-  // Foundations
-  'I Love You':  [true,  true,  false, false, true],
-  'Hello':       [true,  true,  true,  true,  true],
-  'Goodbye':     [true,  true,  true,  true,  true],
-  'Thank You':   [true,  true,  true,  true,  true],
-  'Yes':         [false, false, false, false, false],
-  'No':          [false, true,  true,  false, false],
-  // Alphabet
-  'A':           [false, false, false, false, false],
-  'B':           [false, true,  true,  true,  true],
-  'C':           [true,  true,  true,  true,  true],  // curved — approximate
-  'D':           [false, true,  false, false, false],
-  'E':           [false, false, false, false, false],
-  'F':           [false, true,  true,  true,  true],
-  'G':           [false, true,  false, false, false],
-  'H':           [false, true,  true,  false, false],
-  'I':           [false, false, false, false, true],
-  'J':           [false, false, false, false, true],
-  'K':           [false, true,  true,  false, false],
-  'L':           [true,  true,  false, false, false],
-  'M':           [false, false, false, false, false],
-  'N':           [false, false, false, false, false],
-  'O':           [false, false, false, false, false],
-  'P':           [false, true,  true,  false, false],
-  'R':           [false, true,  true,  false, false],
-  'S':           [false, false, false, false, false],
-  'V':           [false, true,  true,  false, false],
-  'Y':           [true,  false, false, false, true],
-  'Z':           [false, true,  false, false, false],
-  // Numbers
-  '1':           [false, true,  false, false, false],
-  '2':           [false, true,  true,  false, false],
-  '3':           [true,  true,  true,  false, false],
-  '4':           [false, true,  true,  true,  true],
-  '5':           [true,  true,  true,  true,  true],
-  '6':           [true,  false, false, false, true],
-  '7':           [true,  false, false, false, false],
-  '8':           [false, false, true,  false, false],
-  '9':           [false, true,  false, false, false],
-  '10':          [true,  false, false, false, false],
-  // Time
-  'Today':       [true,  true,  true,  true,  true],
-  'Yesterday':   [true,  false, false, false, false],
-  'Tomorrow':    [true,  false, false, false, false],
-  'Week':        [false, true,  false, false, false],
-  // Family
-  'Mother':      [true,  true,  true,  true,  true],
-  'Father':      [true,  true,  true,  true,  true],
-  'Friend':      [false, true,  false, false, false],
-  'Family':      [false, true,  true,  true,  true],
-  'Baby':        [true,  true,  true,  true,  true],
-  'Happy':       [true,  true,  true,  true,  true],
-  'Sad':         [true,  true,  true,  true,  true],
-  'Angry':       [false, true,  true,  true,  false],
-  'Scared':      [true,  true,  true,  true,  true],
-  // Daily life
-  'Eat':         [false, false, false, false, false],
-  'Drink':       [false, false, false, false, false],
-  'Water':       [false, true,  true,  false, false],
-  'Coffee':      [false, false, false, false, false],
-  'Home':        [false, false, false, false, false],
-  'School':      [true,  true,  true,  true,  true],
-  'Work':        [false, false, false, false, false],
-  'Help':        [true,  false, false, false, false],
-  'Stop':        [true,  true,  true,  true,  true],
-  'Doctor':      [false, true,  true,  false, false],
-  'Police':      [false, true,  true,  true,  false],
-};
+
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CURRICULUM DATA
 // ─────────────────────────────────────────────────────────────────────────────
+// XP required to unlock each chapter (chapter 1 always free)
+const CHAPTER_UNLOCK_XP=[0, 0, 50, 120, 200, 300];
+
 const CUR=[
   {id:'c1',title:'Foundations',color:'#6c47ff',icon:'🌱',lessons:[
     {id:'l1',title:'The ILY Sign',desc:'Your first real sign',xp:20,signs:[{e:'🤟',w:'I Love You',d:'Pinky, index and thumb extended — universal ILY sign',steps:['Hold your hand up, palm facing out','Extend your THUMB out to the side','Extend your INDEX finger up','Curl MIDDLE and RING fingers into palm','Extend your PINKY finger up']}],quiz:{q:'ILY extends which fingers?',opts:['All five','Pinky+index+thumb','Just thumb','Index+middle'],a:1}},
@@ -358,11 +381,52 @@ function save(){try{localStorage.setItem('sw5',JSON.stringify(ST));}catch(e){con
 function addXP(n){ST.xp=Math.max(0,(ST.xp||0)+n);save();}
 function markDone(id,signs,xpAmt){
   if(!ST.done.includes(id)){
+    const prevXP=ST.xp;
     ST.done.push(id);addXP(xpAmt);
     signs.forEach(s=>{if(s.w&&!ST.signs.some(x=>x.w===s.w))ST.signs.push(s);});
     ST.journal.push({date:new Date().toLocaleDateString(),lesson:ALL.find(l=>l.id===id)?.title||id,xp:xpAmt,signs:signs.length});
     save();
+    // Check if a new chapter just unlocked
+    CHAPTER_UNLOCK_XP.forEach((threshold,i)=>{
+      if(threshold>0&&prevXP<threshold&&ST.xp>=threshold){
+        const ch=CUR[i];if(!ch)return;
+        showToast(`🔓 <b>${ch.title}</b> unlocked! (${threshold} XP reached)`,'var(--am)');
+      }
+    });
   }
+}
+
+function showXPPop(xp, word){
+  let pop=document.getElementById('xpPop');
+  if(!pop){
+    pop=document.createElement('div');
+    pop.id='xpPop';
+    pop.className='xp-pop';
+    document.body.appendChild(pop);
+  }
+  pop.className='xp-pop';
+  pop.innerHTML=`
+    <div style="font-size:40px;margin-bottom:6px">🎉</div>
+    <div style="font-size:22px;font-weight:900;color:#fff;letter-spacing:-.5px">${word}</div>
+    <div style="font-size:14px;color:rgba(255,255,255,.8);margin-top:4px">+${xp} XP</div>
+  `;
+  requestAnimationFrame(()=>{
+    pop.classList.add('show');
+    setTimeout(()=>{pop.classList.remove('show');pop.classList.add('hide');
+      setTimeout(()=>{pop.className='xp-pop';},400);
+    },1200);
+  });
+}
+
+function showToast(html,color='var(--ac)'){
+  let t=document.getElementById('swToast');
+  if(!t){t=document.createElement('div');t.id='swToast';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--s2);border:1px solid var(--bd2);border-radius:12px;padding:12px 20px;font-size:13px;color:var(--tx);z-index:9999;transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s;opacity:0;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.4)';
+    document.body.appendChild(t);}
+  t.innerHTML=html;t.style.borderColor=color;
+  requestAnimationFrame(()=>{t.style.transform='translateX(-50%) translateY(0)';t.style.opacity='1';});
+  clearTimeout(t._tmr);
+  t._tmr=setTimeout(()=>{t.style.transform='translateX(-50%) translateY(80px)';t.style.opacity='0';},3200);
 }
 
 // Lesson state
@@ -371,12 +435,15 @@ let curLesson=null, lessonStep=0, lessonSignsDone=new Set();
 // Camera / MediaPipe state
 let mpHands=null, mpCamera=null, mpReady=false, camActive=false;
 let matchHoldFrames=0;
+let comboCount=0; // consecutive signs completed without skipping
 const HOLD_NEEDED=10; // ~0.4s at 24fps — feels responsive
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ROUTING
 // ─────────────────────────────────────────────────────────────────────────────
 function go(pg){
+  // Stop home camera when leaving home
+  if(pg!=='home') stopHomeCamera();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   const el=document.getElementById('pg-'+pg);
   if(el){el.classList.add('on');el.querySelectorAll('.fade').forEach(f=>{f.style.animation='none';requestAnimationFrame(()=>f.style.animation='');});}
@@ -404,23 +471,195 @@ function renderHome(){
   const dest=ST.name?'dashboard':'onboard';
   document.getElementById('startBtn').onclick=()=>go(dest);
   document.getElementById('heroStartBtn').onclick=()=>go(dest);
+  const h2=document.getElementById('heroStartBtn2');
+  if(h2) h2.onclick=()=>go(dest);
+}
+
+// ── Home page camera (ILY demo) ───────────────────────────────────────────────
+let homeCam=null, homeHands=null, homeReady=false;
+const ILY_TARGET=[true,true,false,false,true]; // ILY finger target
+
+async function startHomeCamera(){
+  const overlay=document.getElementById('homeCamOverlay');
+  try{
+    if(!homeReady){
+      if(typeof Hands==='undefined') throw new Error('MediaPipe not loaded');
+      homeHands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${f}`});
+      homeHands.setOptions({maxNumHands:1,modelComplexity:0,minDetectionConfidence:0.65,minTrackingConfidence:0.55});
+      homeHands.onResults(onHomeResults);
+      const tmp=document.createElement('canvas');tmp.width=64;tmp.height=64;
+      await homeHands.send({image:tmp}).catch(()=>{});
+      homeReady=true;
+    }
+    const video=document.getElementById('homeVideo');
+    homeCam=new Camera(video,{
+      onFrame:async()=>{ if(homeHands&&video.readyState>=2) await homeHands.send({image:video}); },
+      width:640,height:480
+    });
+    await homeCam.start();
+    if(overlay) overlay.style.display='none';
+    document.getElementById('homeSdot').className='sdot detecting';
+    document.getElementById('homeStatus').textContent='Form the ILY sign 🤟';
+  }catch(e){
+    console.error('Home camera error:',e);
+    if(e.name==='NotAllowedError'||e.name==='PermissionDeniedError'){
+      if(overlay) overlay.innerHTML=`<div style="font-size:32px">🚫</div><div style="font-size:13px;color:var(--mu);text-align:center">Camera blocked.<br>Click the camera icon in your address bar → Allow → Refresh.</div>`;
+    }
+  }
+}
+
+let homeMatchFrames=0;
+function onHomeResults(results){
+  const canvas=document.getElementById('homeCanvas');
+  const video=document.getElementById('homeVideo');
+  if(!canvas||!video)return;
+  const ctx=canvas.getContext('2d');
+  canvas.width=video.videoWidth||640;
+  canvas.height=video.videoHeight||480;
+  ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  if(!results.multiHandLandmarks?.length){
+    document.getElementById('homeSdot').className='sdot detecting';
+    document.getElementById('homeStatus').textContent='Show your hand to the camera';
+    document.getElementById('homeConfBar').style.width='0%';
+    document.getElementById('homeConfTxt').textContent='Form the ILY sign to see detection in action';
+    ['hf0','hf1','hf2','hf3','hf4'].forEach(id=>{
+      const el=document.getElementById(id); if(el){el.className='fing';}
+      const ic=document.getElementById(id.replace('hf','hfi')); if(ic) ic.textContent='—';
+    });
+    ctx.restore();return;
+  }
+
+  const lm=results.multiHandLandmarks[0];
+  drawConnectors(ctx,lm,HAND_CONNECTIONS,{color:'rgba(108,71,255,.55)',lineWidth:2});
+  drawLandmarks(ctx,lm,{color:'#a78bfa',lineWidth:1,radius:3.5});
+  ctx.restore();
+
+  // Use the same finger detection as lessons
+  const fingers=getRawFingers(lm);
+  let score=0;
+  fingers.forEach((f,i)=>{if(f===ILY_TARGET[i])score+=20;});
+
+  // Update finger UI
+  fingers.forEach((ext,i)=>{
+    const el=document.getElementById('hf'+i);
+    const ic=document.getElementById('hfi'+i);
+    if(el) el.className='fing '+(ext===ILY_TARGET[i]?'match':'wrong');
+    if(ic) ic.textContent=ext?'☝️':'✊';
+  });
+
+  // Update bar
+  const bar=document.getElementById('homeConfBar');
+  const txt=document.getElementById('homeConfTxt');
+  if(bar){bar.style.width=score+'%';bar.style.background=score===100?'var(--g)':score>=80?'var(--am)':'var(--ac)';}
+
+  if(score===100){
+    homeMatchFrames++;
+    document.getElementById('homeSdot').className='sdot on';
+    document.getElementById('homeStatus').textContent='🎯 ILY detected!';
+    if(txt) txt.textContent='Perfect! Hold it... '+Math.min(100,Math.round(homeMatchFrames/8*100))+'%';
+    if(homeMatchFrames>=8){
+      const flash=document.getElementById('homeMatchFlash');
+      if(flash){flash.style.opacity='1';setTimeout(()=>flash.style.opacity='0',600);}
+      if(txt) txt.innerHTML='<strong style="color:var(--g)">🎉 You just signed I Love You!</strong> Start lessons to learn more →';
+      homeMatchFrames=0;
+      // Nudge to start after success
+      setTimeout(()=>{
+        const dest=ST.name?'dashboard':'onboard';
+        showToast('🤟 You got it! Ready to learn more?','var(--g)');
+      },800);
+    }
+  } else {
+    homeMatchFrames=0;
+    document.getElementById('homeSdot').className='sdot detecting';
+    document.getElementById('homeStatus').textContent='Form the ILY sign 🤟';
+    if(score>=80){
+      const wrong=fingers.map((f,i)=>f!==ILY_TARGET[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
+      if(txt) txt.textContent='Almost! Fix your '+wrong.join(', ');
+    } else {
+      if(txt) txt.textContent=score>=40?'Getting closer — extend pinky + index + thumb':'Extend your pinky, index finger, and thumb';
+    }
+  }
+}
+
+function stopHomeCamera(){
+  if(homeCam){try{homeCam.stop();}catch{}}
+  homeCam=null;
+  const v=document.getElementById('homeVideo');
+  if(v?.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null;}
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // ONBOARD
 // ─────────────────────────────────────────────────────────────────────────────
 function renderOnboard(){
-  const lg=document.getElementById('lvlGrid');if(!lg)return;lg.innerHTML='';
-  let selLv='beginner';
-  [['🌱','Beginner','Just starting'],['🌿','Elementary','Know basics'],['🌳','Intermediate','Conversational'],['🏔','Advanced','Near-fluent']].forEach(([e,l,d])=>{
-    const b=document.createElement('button');
-    const active=selLv===l.toLowerCase();
-    b.style.cssText=`padding:11px;border-radius:11px;border:1px solid ${active?'#6c47ff':'rgba(255,255,255,.08)'};background:${active?'rgba(108,71,255,.15)':'transparent'};color:${active?'#a78bfa':'#5a6175'};font-size:12px;cursor:pointer;text-align:left;font-family:inherit`;
-    b.innerHTML=`<span style="display:block;font-size:16px;margin-bottom:3px">${e}</span><strong>${l}</strong><div style="font-size:10px;opacity:.6;margin-top:1px">${d}</div>`;
-    b.onclick=()=>{selLv=l.toLowerCase();lg.querySelectorAll('button').forEach(x=>{x.style.border='1px solid rgba(255,255,255,.08)';x.style.background='transparent';x.style.color='#5a6175';});b.style.border='1px solid #6c47ff';b.style.background='rgba(108,71,255,.15)';b.style.color='#a78bfa';};
-    lg.appendChild(b);
+  // Reset steps
+  [0,1,2].forEach(i=>{
+    const s=document.getElementById('obStep'+i);
+    if(s)s.style.display=i===0?'block':'none';
   });
-  window.doOnboard=function(){ST.name=document.getElementById('nameIn')?.value?.trim()||'Learner';ST.level=selLv;save();go('dashboard');};
+  // Step dot state
+  function setDots(step){
+    [0,1,2].forEach(i=>{
+      const d=document.getElementById('od'+i);
+      if(d){d.style.width=i===step?'28px':'8px';d.style.background=i<=step?'var(--ac)':'rgba(255,255,255,.1)';}
+    });
+  }
+
+  // Build WHY grid
+  let selWhy='';
+  const wg=document.getElementById('whyGrid');
+  if(wg){
+    wg.innerHTML='';
+    [['🧏','Talk to deaf people'],['💼','Career / work skill'],['🎓','Study / school'],['❤️','Personal interest']].forEach(([ic,label])=>{
+      const b=document.createElement('button');
+      b.style.cssText='padding:12px 10px;border-radius:11px;border:1px solid rgba(255,255,255,.08);background:transparent;color:var(--mu);font-size:12px;cursor:pointer;text-align:center;font-family:inherit;transition:all .15s;line-height:1.4';
+      b.innerHTML=`<span style="display:block;font-size:22px;margin-bottom:4px">${ic}</span>${label}`;
+      b.onclick=()=>{
+        selWhy=label;
+        wg.querySelectorAll('button').forEach(x=>{x.style.border='1px solid rgba(255,255,255,.08)';x.style.background='transparent';x.style.color='var(--mu)';});
+        b.style.border='1px solid #6c47ff';b.style.background='rgba(108,71,255,.12)';b.style.color='#a78bfa';
+      };
+      wg.appendChild(b);
+    });
+  }
+
+  // Build LEVEL grid
+  let selLv='beginner';
+  const lg=document.getElementById('lvlGrid');
+  if(lg){
+    lg.innerHTML='';
+    [['🌱','Beginner','Just starting'],['🌿','Elementary','Know basics'],['🌳','Intermediate','Conversational'],['🏔','Advanced','Near-fluent']].forEach(([e,l,d])=>{
+      const b=document.createElement('button');
+      const active=selLv===l.toLowerCase();
+      b.style.cssText=`padding:11px;border-radius:11px;border:1px solid ${active?'#6c47ff':'rgba(255,255,255,.08)'};background:${active?'rgba(108,71,255,.15)':'transparent'};color:${active?'#a78bfa':'#5a6175'};font-size:12px;cursor:pointer;text-align:left;font-family:inherit`;
+      b.innerHTML=`<span style="display:block;font-size:16px;margin-bottom:3px">${e}</span><strong>${l}</strong><div style="font-size:10px;opacity:.6;margin-top:1px">${d}</div>`;
+      b.onclick=()=>{selLv=l.toLowerCase();lg.querySelectorAll('button').forEach(x=>{x.style.border='1px solid rgba(255,255,255,.08)';x.style.background='transparent';x.style.color='#5a6175';});b.style.border='1px solid #6c47ff';b.style.background='rgba(108,71,255,.15)';b.style.color='#a78bfa';};
+      lg.appendChild(b);
+    });
+  }
+
+  window.obNext=function(step){
+    [0,1,2].forEach(i=>{const s=document.getElementById('obStep'+i);if(s)s.style.display=i===step?'block':'none';});
+    setDots(step);
+    // Animate in
+    const el=document.getElementById('obStep'+step);
+    if(el){el.style.opacity='0';el.style.transform='translateY(12px)';requestAnimationFrame(()=>{el.style.transition='opacity .25s,transform .25s';el.style.opacity='1';el.style.transform='translateY(0)';});}
+    if(step===2){
+      // Personalise heading based on why
+      const h=el?.querySelector('h2');
+      if(h&&selWhy==='Talk to deaf people')h.textContent='Your journey starts here';
+      if(h&&selWhy==='Career / work skill')h.textContent='Level up your career';
+    }
+  };
+
+  window.doOnboard=function(){
+    ST.name=document.getElementById('nameIn')?.value?.trim()||'Learner';
+    ST.level=selLv;
+    ST.why=selWhy||'';
+    save();
+    startLesson('l1');
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -429,44 +668,129 @@ function renderOnboard(){
 function renderDash(){
   const el=document.getElementById('dashBody');if(!el)return;
   const next=ALL.find(l=>!ST.done.includes(l.id));
+  const hr=new Date().getHours();
+  const hoursLeft=hr<20?20-hr:24-(hr-20);
+  const streakMsg=ST.streak>1
+    ?`\u{1F525} Don't break your ${ST.streak}-day streak \u2014 <strong style="color:var(--am)">${hoursLeft}h left today</strong>`
+    :`Start your streak today \u2014 just 10 minutes counts`;
+  const purposeLines=[
+    `Every sign you learn helps a deaf person feel <strong style="color:#a78bfa">less invisible</strong>`,
+    `You're becoming someone who can cross a barrier most people never try`,
+    `${ST.signs.length} signs learned — that's ${ST.signs.length} moments of real connection`,
+    `Most people say "I should learn sign language." You're actually doing it.`,
+    `You are now able to communicate with ${ST.signs.length} signs a deaf person will understand`,
+  ];
+  const identityMsg=
+    ST.done.length===0?`Every sign you learn helps a deaf person feel <strong style="color:#a78bfa">less invisible</strong>`
+    :purposeLines[ST.done.length % purposeLines.length];
+  const pct=Math.round((ST.done.length/ALL.length)*100);
   el.innerHTML=`
-    <div style="margin-bottom:22px"><h2 style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Good day, ${ST.name||'Learner'} 👋</h2><div style="color:var(--mu);font-size:13px">Keep your streak alive — just 10 minutes today</div></div>
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px">
-      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:#6c47ff">${ST.xp}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Total XP</div></div>
-      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--am)">🔥${ST.streak}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Day streak</div></div>
-      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--g)">${ST.done.length}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Lessons done</div></div>
-      <div class="card" style="text-align:center"><div style="font-size:24px;font-weight:900;color:var(--cy)">${ST.signs.length}</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Signs learned</div></div>
+    <div style="margin-bottom:20px">
+      <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px">Hey ${ST.name||'there'} \u{1F44B}</h2>
+      <div style="font-size:13px;color:var(--mu);line-height:1.5">${identityMsg}</div>
     </div>
-    <div style="background:linear-gradient(135deg,rgba(108,71,255,.15),rgba(255,71,145,.08));border:1px solid rgba(108,71,255,.25);border-radius:16px;padding:18px 20px;margin-bottom:22px;display:flex;align-items:center;gap:16px">
-      <div style="font-size:44px">${DAILY.e}</div>
-      <div style="flex:1"><div style="font-size:10px;color:#a78bfa;font-weight:700;letter-spacing:.5px;margin-bottom:4px">⚡ SIGN OF THE DAY</div><div style="font-size:16px;font-weight:800;margin-bottom:3px">${DAILY.w}</div><div style="font-size:12px;color:var(--mu);line-height:1.5">${DAILY.d}</div><div style="font-size:11px;color:var(--mu);margin-top:5px;font-style:italic">${DAILY.fact}</div></div>
+    ${ST.streak>0?`<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--am)">${streakMsg}</div>`:''}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
+      <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:900;color:#6c47ff">${ST.xp}</div><div style="font-size:10px;color:var(--mu);margin-top:3px">Total XP</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--am)">\u{1F525}${ST.streak}</div><div style="font-size:10px;color:var(--mu);margin-top:3px">Day streak</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--g)">${ST.done.length}</div><div style="font-size:10px;color:var(--mu);margin-top:3px">Lessons done</div></div>
+      <div class="card" style="text-align:center"><div style="font-size:22px;font-weight:900;color:var(--cy)">${ST.signs.length}</div><div style="font-size:10px;color:var(--mu);margin-top:3px">Signs known</div></div>
     </div>
-    ${next?`<div style="margin-bottom:22px"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px">Continue Learning</div><div style="background:var(--s2);border:1px solid ${next.col}44;border-radius:14px;padding:16px 20px;display:flex;align-items:center;gap:16px;cursor:pointer" onclick="startLesson('${next.id}')"><div style="width:46px;height:46px;border-radius:12px;background:${next.col}22;border:1px solid ${next.col}44;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">${next.signs[0]?.e||'📚'}</div><div style="flex:1"><div style="font-size:14px;font-weight:700;margin-bottom:2px">${next.title}</div><div style="font-size:12px;color:var(--mu)">${next.ct} · ${next.xp} XP · ${next.signs.length} signs</div></div><div style="padding:7px 16px;background:${next.col};border-radius:9px;color:#fff;font-size:12px;font-weight:700">Continue →</div></div></div>`:'<div style="text-align:center;padding:20px;color:var(--g);font-size:14px;font-weight:700">🎉 All lessons complete! Amazing work!</div>'}
-    <div style="margin-bottom:22px"><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Curriculum</div><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px">${CUR.map(c=>{const done=c.lessons.filter(l=>ST.done.includes(l.id)).length;const p=Math.round((done/c.lessons.length)*100);return`<div style="background:var(--s2);border:1px solid ${c.color}30;border-radius:12px;padding:14px;cursor:pointer" onclick="go('lessons')"><div style="font-size:22px;margin-bottom:7px">${c.icon}</div><div style="font-size:13px;font-weight:700;margin-bottom:3px">${c.title}</div><div style="font-size:11px;color:var(--mu);margin-bottom:7px">${done}/${c.lessons.length} lessons</div><div class="pbar"><div class="pfill" style="width:${p}%;background:${c.color}"></div></div></div>`;}).join('')}</div></div>
-    ${ST.signs.length?`<div><div style="font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:9px">Signs You Know (${ST.signs.length})</div><div style="display:flex;flex-wrap:wrap;gap:6px">${ST.signs.slice(-24).map(s=>`<span style="padding:3px 11px;border-radius:20px;background:rgba(108,71,255,.12);border:1px solid rgba(108,71,255,.25);font-size:11px;font-weight:700;color:#a78bfa">${s.e} ${s.w}</span>`).join('')}</div></div>`:''}`;
+    ${next?`
+    <div style="margin-bottom:20px">
+      <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">${ST.done.length===0?"👇 Start here — your first sign":"Your next sign"}</div>
+      <div style="background:linear-gradient(135deg,${next.col}22,${next.col}0a);border:1px solid ${next.col}55;border-radius:16px;padding:18px 20px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:all .2s" onclick="startLesson('${next.id}')" onmouseenter="this.style.transform='translateY(-2px)'" onmouseleave="this.style.transform=''">
+        <div style="width:52px;height:52px;border-radius:14px;background:${next.col}22;border:1px solid ${next.col}44;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0">${next.signs[0]?.e||'\u{1F4DA}'}</div>
+        <div style="flex:1"><div style="font-size:16px;font-weight:800;margin-bottom:3px">${next.title}</div><div style="font-size:12px;color:var(--mu)">${next.ct} \u00b7 ${next.signs.length} signs \u00b7 ${next.xp} XP</div></div>
+        <div style="padding:10px 20px;background:${next.col};border-radius:10px;color:#fff;font-size:13px;font-weight:800;flex-shrink:0">Start \u2192</div>
+      </div>
+    </div>`
+    :`<div style="text-align:center;padding:20px;color:var(--g);font-size:14px;font-weight:700">\u{1F389} All ${ALL.length} lessons complete! You're incredible.</div>`}
+    <div style="background:linear-gradient(135deg,rgba(108,71,255,.12),rgba(255,71,145,.06));border:1px solid rgba(108,71,255,.2);border-radius:14px;padding:16px 18px;margin-bottom:20px;display:flex;align-items:center;gap:14px">
+      <div style="font-size:38px">${DAILY.e}</div>
+      <div style="flex:1"><div style="font-size:9px;color:#a78bfa;font-weight:700;letter-spacing:.5px;margin-bottom:3px">\u26A1 SIGN OF THE DAY</div><div style="font-size:15px;font-weight:800;margin-bottom:2px">${DAILY.w}</div><div style="font-size:11px;color:var(--mu);line-height:1.5">${DAILY.d}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px">Your path \u2014 ${pct}% complete</div>
+      <button onclick="go('lessons')" style="font-size:11px;color:var(--ac);background:none;border:none;cursor:pointer;font-family:inherit">See all lessons \u2192</button>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:20px">
+      ${CUR.map(c=>{const done=c.lessons.filter(l=>ST.done.includes(l.id)).length;const p=Math.round((done/c.lessons.length)*100);return`<div style="background:var(--s2);border:1px solid ${p===100?c.color+'55':'rgba(255,255,255,.06)'};border-radius:10px;padding:12px;cursor:pointer" onclick="go('lessons')"><div style="font-size:18px;margin-bottom:5px">${p===100?'\u2705':c.icon}</div><div style="font-size:12px;font-weight:700;margin-bottom:4px">${c.title}</div><div class="pbar"><div class="pfill" style="width:${p}%;background:${c.color}"></div></div></div>`;}).join('')}
+    </div>
+    ${ST.signs.length?`<div><div style="font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">Signs you know (${ST.signs.length})</div><div style="display:flex;flex-wrap:wrap;gap:5px">${ST.signs.slice(-20).map(s=>`<span style="padding:3px 10px;border-radius:20px;background:rgba(108,71,255,.1);border:1px solid rgba(108,71,255,.2);font-size:11px;font-weight:700;color:#a78bfa">${s.e} ${s.w}</span>`).join('')}</div></div>`:''}`;
   checkStreak();
 }
-
 // ─────────────────────────────────────────────────────────────────────────────
 // LESSONS LIST
 // ─────────────────────────────────────────────────────────────────────────────
+function isChapterUnlocked(idx){
+  return ST.xp>=(CHAPTER_UNLOCK_XP[idx]||0);
+}
+
 function renderLessons(){
   const el=document.getElementById('lessonsBody');if(!el)return;
-  el.innerHTML=`<h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:20px">All Lessons (${ALL.length} total)</h2>`+CUR.map(c=>`
-    <div style="margin-bottom:28px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span style="font-size:20px">${c.icon}</span><div><div style="font-size:14px;font-weight:700">${c.title}</div><div style="font-size:11px;color:var(--mu)">${c.lessons.filter(l=>ST.done.includes(l.id)).length}/${c.lessons.length} complete</div></div></div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-        ${c.lessons.map(l=>{const done=ST.done.includes(l.id);return`<div style="background:var(--s2);border:1px solid ${done?c.color+'55':'rgba(255,255,255,.07)'};border-radius:12px;padding:14px;cursor:pointer;position:relative" onclick="startLesson('${l.id}')">${done?`<div style="position:absolute;top:10px;right:10px;background:${c.color};color:#fff;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700">✓ DONE</div>`:''}<div style="font-size:26px;margin-bottom:7px">${l.signs[0]?.e||'📚'}</div><div style="font-size:13px;font-weight:700;margin-bottom:2px">${l.title}</div><div style="font-size:11px;color:var(--mu);margin-bottom:7px">${l.desc}</div><div style="font-size:11px;color:${c.color};font-weight:600">+${l.xp} XP · ${l.signs.length} signs</div><div style="font-size:10px;color:var(--mu);margin-top:4px">🖐 Hand detection included</div></div>`;}).join('')}
+  const done=ST.done.length, total=ALL.length;
+  el.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px">All Lessons</h2>
+    <span style="font-size:12px;color:var(--mu)">${done}/${total} done · ${ST.xp} XP</span>
+  </div>`+CUR.map((c,ci)=>{
+    const unlocked=isChapterUnlocked(ci);
+    const needed=CHAPTER_UNLOCK_XP[ci]||0;
+    const chDone=c.lessons.filter(l=>ST.done.includes(l.id)).length;
+    if(!unlocked){
+      return`<div style="margin-bottom:20px;opacity:.6">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <span style="font-size:20px">🔒</span>
+          <div><div style="font-size:14px;font-weight:700">${c.title}</div>
+          <div style="font-size:11px;color:var(--am)">Unlocks at ${needed} XP — you have ${ST.xp} XP (${Math.max(0,needed-ST.xp)} more needed)</div></div>
+        </div>
+        <div style="height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden">
+          <div style="height:100%;background:var(--am);border-radius:2px;width:${Math.min(100,Math.round((ST.xp/needed)*100))}%;transition:width 1s ease"></div>
+        </div>
+      </div>`;
+    }
+    return`<div style="margin-bottom:28px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+        <span style="font-size:20px">${c.icon}</span>
+        <div><div style="font-size:14px;font-weight:700">${c.title}</div>
+        <div style="font-size:11px;color:var(--mu)">${chDone}/${c.lessons.length} complete</div></div>
       </div>
-    </div>`).join('');
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+        ${c.lessons.map(l=>{
+          const done=ST.done.includes(l.id);
+          return`<div style="background:var(--s2);border:1px solid ${done?c.color+'55':'rgba(255,255,255,.07)'};border-radius:12px;padding:14px;cursor:pointer;position:relative;transition:border-color .2s" onclick="startLesson('${l.id}')" onmouseenter="this.style.borderColor='${c.color}88'" onmouseleave="this.style.borderColor='${done?c.color+'55':'rgba(255,255,255,.07)'}'">
+            ${done?`<div style="position:absolute;top:10px;right:10px;background:${c.color};color:#fff;border-radius:20px;padding:2px 8px;font-size:9px;font-weight:700">✓ DONE</div>`:''}
+            <div style="font-size:26px;margin-bottom:7px">${l.signs[0]?.e||'📚'}</div>
+            <div style="font-size:13px;font-weight:700;margin-bottom:2px">${l.title}</div>
+            <div style="font-size:11px;color:var(--mu);margin-bottom:7px">${l.desc}</div>
+            <div style="font-size:11px;color:${c.color};font-weight:600">+${l.xp} XP · ${l.signs.length} signs</div>
+            <div style="font-size:10px;color:var(--mu);margin-top:4px">🖐 Practice mirror</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function startLesson(id){
-  curLesson=ALL.find(l=>l.id===id);
+  const lesson=ALL.find(l=>l.id===id);
+  if(!lesson){return;}
+  const chIdx=CUR.findIndex(c=>c.id===lesson.cc);
+  if(!isChapterUnlocked(chIdx)){
+    const needed=CHAPTER_UNLOCK_XP[chIdx]||0;
+    showToast(`🔒 Earn ${needed-ST.xp} more XP to unlock <b>${CUR[chIdx]?.title}</b>`,'var(--am)');
+    return;
+  }
+  curLesson=lesson;
   lessonStep=0;
   lessonSignsDone=new Set();
   matchHoldFrames=0;
+  clearMotion();
   go('lesson');
+  // Auto-start camera if already granted permission
+  navigator.permissions?.query({name:'camera'}).then(p=>{
+    if(p.state==='granted') setTimeout(()=>startCamera(),400);
+  }).catch(()=>{});
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -483,7 +807,7 @@ function renderLesson(){
 
   if(!inQuiz){
     const s=l.signs[lessonStep];
-    const target=FINGER_TARGETS[s.w];
+    const signDef=SIGN_DEF[s.w];
     const isDone=lessonSignsDone.has(lessonStep);
 
     el.innerHTML=`
@@ -507,9 +831,9 @@ function renderLesson(){
           <div style="font-size:80px;margin-bottom:12px">${s.e}</div>
           <h2 style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:8px;color:${l.col}">${s.w}</h2>
           <div style="font-size:13px;color:var(--mu);line-height:1.7;margin-bottom:4px">${s.d}</div>
-          ${target?`<div style="font-size:10px;color:var(--ac);font-weight:700;margin-bottom:14px;letter-spacing:.5px">🖐 HAND DETECTION ACTIVE</div>`:`<div style="font-size:10px;color:var(--mu);margin-bottom:14px">📌 No detection for this sign — practice manually</div>`}
+          ${signDef?`<div style="font-size:10px;color:var(--ac);font-weight:700;margin-bottom:14px;letter-spacing:.5px">🖐 PRACTICE MIRROR — finger shape${signDef?.motion?' + motion':''} detection</div>`:`<div style="font-size:10px;color:var(--mu);margin-bottom:14px">📌 No detection for this sign — practice manually</div>`}
           ${s.steps?`<div class="steps-card">${s.steps.map((st,i)=>`<div><span>${i+1}.</span>${st}</div>`).join('')}</div>`:''}
-          ${isDone?`<div style="margin-top:14px;padding:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:10px;font-size:13px;color:var(--g);font-weight:700">✓ Sign mastered!</div>`:''}
+          ${isDone?`<div style="margin-top:14px;padding:10px;background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:10px;font-size:13px;color:var(--g);font-weight:700">✓ Practised!</div>`:''}
         </div>
 
         <!-- RIGHT: Camera panel -->
@@ -519,7 +843,10 @@ function renderLesson(){
               <span class="sdot" id="sdot"></span>
               <span id="camStatus">Camera off</span>
             </div>
-            <span style="font-size:10px;color:var(--mu)" id="fpsLbl"></span>
+            <span style="font-size:10px;color:var(--mu);text-align:right" id="fpsLbl"></span>
+          </div>
+          <div style="padding:7px 16px;background:rgba(245,158,11,.07);border-bottom:1px solid rgba(245,158,11,.12);font-size:10px;color:#a07020;line-height:1.4">
+            ⚠️ <b>Practice mirror</b> — detects finger shape only. Real signing also uses movement, orientation, and position near your body.
           </div>
           <div class="cam-wrap">
             <video id="camVideo" autoplay playsinline muted></video>
@@ -538,13 +865,13 @@ function renderLesson(){
           </div>
           <div class="fb-bar" id="fbBar">
             <div class="fb-icon">👋</div>
-            <div class="fb-txt">${target?`Enable camera and form the <b>${s.w}</b> sign`:'Practice this sign by following the steps on the left'}</div>
+            <div class="fb-txt">${signDef?`Enable camera and form the <b>${s.w}</b> sign`:'Practice this sign by following the steps on the left'}</div>
           </div>
-          <div class="conf-section" id="confSection" style="${target?'':'display:none'}">
-            <div class="conf-label"><span>Match confidence</span><span id="confPct">0%</span></div>
+          <div class="conf-section" id="confSection" style="${signDef?'':'display:none'}">
+            <div class="conf-label"><span>Hand shape guide</span><span id="confPct">—</span></div>
             <div class="conf-bar"><div class="conf-fill" id="confFill"></div></div>
           </div>
-          <div class="finger-row" id="fingerRow" style="${target?'':'display:none'}">
+          <div class="finger-row" id="fingerRow" style="${signDef?'':'display:none'}">
             ${['Thumb','Index','Middle','Ring','Pinky'].map((n,i)=>`<div class="fing" id="fing${i}"><div class="fing-name">${n}</div><div class="fing-icon" id="fi${i}">—</div></div>`).join('')}
           </div>
         </div>
@@ -553,7 +880,7 @@ function renderLesson(){
       <!-- Bottom nav -->
       <div style="display:flex;gap:10px;justify-content:center;margin-top:18px">
         ${lessonStep>0?`<button class="btn-o" onclick="switchLessonSign(${lessonStep-1})">← Previous</button>`:''}
-        ${isDone||!target
+        ${isDone||!signDef
           ? `<button class="btn-p" style="background:${l.col}" onclick="switchLessonSign(${lessonStep+1<total?lessonStep+1:total})">${lessonStep<total-1?'Next Sign →':'Take Quiz ⚡'}</button>`
           : `<button class="btn-o" onclick="skipSign()" style="font-size:12px">Skip for now</button>`
         }
@@ -586,6 +913,7 @@ function switchLessonSign(idx){
 }
 
 function skipSign(){
+  comboCount=0; // break combo on skip
   switchLessonSign(lessonStep+1<curLesson.signs.length?lessonStep+1:curLesson.signs.length);
 }
 
@@ -599,8 +927,12 @@ function answerQuiz(chosen,correct,lid,xpAmt){
   document.querySelector('#quizOpts').after(fb);
   const cb=document.createElement('button');
   cb.className='btn-p';cb.style.cssText=`margin-top:14px;width:100%;background:${curLesson?.col||'#6c47ff'}`;
-  cb.textContent=`✅ Complete Lesson +${xpAmt} XP`;
-  cb.onclick=()=>{markDone(lid,curLesson?.signs||[],xpAmt);stopCamera();go('dashboard');};
+  cb.textContent=`✅ Mark lesson done  +${xpAmt} XP`;
+  cb.onclick=()=>{
+    markDone(lid,curLesson?.signs||[],xpAmt);
+    showXPPop(xpAmt,'Lesson Complete!');
+    setTimeout(()=>{stopCamera();go('dashboard');},1400);
+  };
   fb.after(cb);
 }
 
@@ -628,8 +960,12 @@ function setConf(pct){
   const lbl=document.getElementById('confPct');
   if(!fill||!lbl)return;
   fill.style.width=pct+'%';
-  fill.style.background=pct>75?'var(--g)':pct>40?'var(--am)':'var(--ac)';
-  lbl.textContent=pct+'%';
+  // Qualitative labels — honest about what we can detect
+  if(pct===0){fill.style.background='var(--mu)';lbl.textContent='no hand';}
+  else if(pct<=40){fill.style.background='var(--rd)';lbl.textContent='keep trying';}
+  else if(pct<=79){fill.style.background='var(--am)';lbl.textContent='getting close';}
+  else if(pct<100){fill.style.background='#7bc67e';lbl.textContent='almost there';}
+  else{fill.style.background='var(--g)';lbl.textContent='looks right!';}
 }
 
 function updateFingers(states,target){
@@ -648,89 +984,220 @@ function updateFingers(states,target){
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Rolling buffer for temporal smoothing — reduces flickering from single-frame noise
-const SMOOTH_FRAMES=5;
-const fingerBuffer=[[], [], [], [], []]; // one ring buffer per finger
+// ─────────────────────────────────────────────────────────────────────────────
+// DETECTION ENGINE v2 — finger shape + motion tracking + position awareness
+// ─────────────────────────────────────────────────────────────────────────────
 
-function pushSmooth(finger, value){
-  fingerBuffer[finger].push(value);
-  if(fingerBuffer[finger].length>SMOOTH_FRAMES)fingerBuffer[finger].shift();
-  // Return smoothed value: extended if majority of recent frames say extended
-  const ext=fingerBuffer[finger].filter(Boolean).length;
-  return ext > fingerBuffer[finger].length/2;
+// ── Temporal smoothing ────────────────────────────────────────────────────────
+const SMOOTH_FRAMES=6;
+const fingerBuffer=[[], [], [], [], []];
+function pushSmooth(i,v){
+  fingerBuffer[i].push(v);
+  if(fingerBuffer[i].length>SMOOTH_FRAMES)fingerBuffer[i].shift();
+  return fingerBuffer[i].filter(Boolean).length > fingerBuffer[i].length/2;
 }
-
 function clearSmooth(){fingerBuffer.forEach(b=>b.length=0);}
 
-// Distance between two landmarks
+// ── Motion tracking ───────────────────────────────────────────────────────────
+// Store wrist position history to detect movement direction
+const MOTION_FRAMES=18; // ~0.75s of motion history at 24fps
+const wristHistory=[];  // [{x,y,z,t}]
+let motionDetected=null; // null | 'up'|'down'|'left'|'right'|'forward'|'out'
+
+function pushWrist(lm){
+  const w=lm[0];
+  wristHistory.push({x:w.x,y:w.y,z:w.z,t:performance.now()});
+  if(wristHistory.length>MOTION_FRAMES)wristHistory.shift();
+}
+
+// Returns dominant motion over the last N frames, or null if hand is still
+function getMotion(){
+  if(wristHistory.length<8)return null;
+  const old=wristHistory[0], cur=wristHistory[wristHistory.length-1];
+  const dx=cur.x-old.x, dy=cur.y-old.y, dz=cur.z-old.z;
+  const threshold=0.06; // normalised units
+  const mag=Math.sqrt(dx*dx+dy*dy);
+  if(mag<threshold)return null; // stationary
+  // Dominant axis
+  if(Math.abs(dy)>Math.abs(dx)){
+    return dy<0?'up':'down'; // y inverted in MediaPipe
+  } else {
+    return dx<0?'right':'left';
+  }
+}
+function clearMotion(){wristHistory.length=0;motionDetected=null;}
+
+// ── Geometry helpers ─────────────────────────────────────────────────────────
 function dist(a,b){return Math.sqrt((a.x-b.x)**2+(a.y-b.y)**2+(a.z-b.z)**2);}
 
-// Detect hand orientation — palm facing camera or away
-// Uses cross-product of wrist→index_base and wrist→pinky_base
-function isHandFacingCamera(lm){
+function handScale(lm){return dist(lm[0],lm[9])||0.1;}
+
+// Palm facing camera: cross product of wrist→index_base × wrist→pinky_base
+function palmFacing(lm){
   const w=lm[0],ib=lm[5],pb=lm[17];
-  const ax=ib.x-w.x, ay=ib.y-w.y;
-  const bx=pb.x-w.x, by=pb.y-w.y;
-  return (ax*by - ay*bx) > 0; // positive = palm toward camera
+  return ((ib.x-w.x)*(pb.y-w.y)-(ib.y-w.y)*(pb.x-w.x))>0;
 }
 
-// Compute hand scale — normalises thresholds to hand size
-// so detection works whether hand is close or far from camera
-function handScale(lm){
-  return dist(lm[0],lm[9])||0.1; // wrist to middle MCP
+// Is wrist near forehead? (y of wrist < y of nose approximation)
+// MediaPipe doesn't give face landmarks so we use relative screen position
+function wristNearForehead(lm){
+  // Wrist y < 0.35 of frame height = upper third of frame = forehead area
+  return lm[0].y < 0.38;
 }
+function wristNearChin(lm){return lm[0].y>0.45&&lm[0].y<0.72;}
+function wristNearChest(lm){return lm[0].y>0.65;}
+function wristNearMouth(lm){return lm[0].y>0.42&&lm[0].y<0.62;}
 
-// Core: determine if each finger is extended
-// Returns array of 5 raw booleans [thumb,index,middle,ring,pinky]
+// ── Finger state detection ────────────────────────────────────────────────────
 function getRawFingers(lm){
   const scale=handScale(lm);
-  const facing=isHandFacingCamera(lm);
-
-  // Finger tip, PIP, MCP landmark indices
-  const TIP=[4, 8,12,16,20];
-  const PIP=[3, 7,11,15,19]; // DIP for more accurate curl
-  const MCP=[2, 5, 9,13,17];
-
-  return TIP.map((tipIdx,i)=>{
+  const TIP=[4,8,12,16,20], PIP=[3,7,11,15,19], MCP=[2,5,9,13,17];
+  return TIP.map((tip,i)=>{
     if(i===0){
-      // Thumb: compare distance from thumb tip to index MCP
-      // vs thumb base to index MCP — extended if tip is farther away
-      const tipDist=dist(lm[tipIdx],lm[5]);
+      const tipDist=dist(lm[tip],lm[5]);
       const baseDist=dist(lm[MCP[i]],lm[5]);
-      // Also consider lateral extension (x-axis distance)
-      const lateralDist=Math.abs(lm[tipIdx].x-lm[5].x);
-      return tipDist > baseDist*0.85 || lateralDist > scale*0.6;
+      const lat=Math.abs(lm[tip].x-lm[5].x);
+      return tipDist>baseDist*0.85||lat>scale*0.6;
     }
-    // Other fingers: tip above PIP in the finger's own coordinate space
-    // Use both y-axis and actual 3D distance for angle tolerance
-    const tipY=lm[tipIdx].y;
-    const pipY=lm[PIP[i]].y;
-    const mcpY=lm[MCP[i]].y;
-    // Straight-up: tip clearly above PIP
-    const yExtended=tipY < pipY - scale*0.05;
-    // Side/angled: tip farther from wrist than PIP
-    const dTip=dist(lm[tipIdx],lm[0]);
-    const dPip=dist(lm[PIP[i]],lm[0]);
-    const distExtended=dTip > dPip*1.08;
-    return yExtended || distExtended;
+    const yExt=lm[tip].y < lm[PIP[i]].y - scale*0.04;
+    const dExt=dist(lm[tip],lm[0]) > dist(lm[PIP[i]],lm[0])*1.07;
+    return yExt||dExt;
   });
 }
-
-// Smoothed finger states
 function getFingers(lm){
-  const raw=getRawFingers(lm);
-  return raw.map((v,i)=>pushSmooth(i,v));
+  return getRawFingers(lm).map((v,i)=>pushSmooth(i,v));
 }
 
-// Weighted confidence — some fingers matter more for each sign
-// Returns 0-100 score
-function scoreSign(fingers, target){
-  if(!target)return 0;
-  // Fingers that are DIFFERENT from target get penalised
-  let score=0;
-  fingers.forEach((f,i)=>{ if(f===target[i])score+=20; });
-  return score; // 0,20,40,60,80,100
+// ── Sign definition system (extended beyond finger states) ───────────────────
+// Each sign: { fingers, position?, motion?, palmOut? }
+// position: 'forehead'|'chin'|'chest'|'mouth'|'any'
+// motion:   'up'|'down'|'left'|'right'|'out'|null (null=static hold)
+// palmOut:  true=palm toward camera, false=palm away, null=don't check
+const SIGN_DEF = {
+  // ── Foundations ──
+  'I Love You':  {fingers:[true,true,false,false,true], motion:null, palmOut:true},
+  'Hello':       {fingers:[true,true,true,true,true],   motion:'out', position:'forehead', palmOut:true},
+  'Goodbye':     {fingers:[true,true,true,true,true],   motion:null, palmOut:true},
+  'Thank You':   {fingers:[true,true,true,true,true],   motion:'out', position:'chin', palmOut:true},
+  'Yes':         {fingers:[false,false,false,false,false], motion:'down', palmOut:null},
+  'No':          {fingers:[false,true,true,false,false],  motion:null,   palmOut:null},
+  // ── Alphabet (static — no motion needed) ──
+  'A':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'B':{fingers:[false,true,true,true,true],    motion:null,palmOut:true},
+  'C':{fingers:[true,true,true,true,true],     motion:null,palmOut:true},
+  'D':{fingers:[false,true,false,false,false], motion:null,palmOut:true},
+  'E':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'F':{fingers:[false,true,true,true,true],    motion:null,palmOut:true},
+  'G':{fingers:[false,true,false,false,false], motion:null,palmOut:null},
+  'H':{fingers:[false,true,true,false,false],  motion:null,palmOut:null},
+  'I':{fingers:[false,false,false,false,true], motion:null,palmOut:true},
+  'J':{fingers:[false,false,false,false,true], motion:'left',palmOut:true},
+  'K':{fingers:[false,true,true,false,false],  motion:null,palmOut:true},
+  'L':{fingers:[true,true,false,false,false],  motion:null,palmOut:true},
+  'M':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'N':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'O':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'P':{fingers:[false,true,true,false,false],  motion:'down',palmOut:null},
+  'R':{fingers:[false,true,true,false,false],  motion:null,palmOut:true},
+  'S':{fingers:[false,false,false,false,false],motion:null,palmOut:true},
+  'V':{fingers:[false,true,true,false,false],  motion:null,palmOut:true},
+  'Y':{fingers:[true,false,false,false,true],  motion:null,palmOut:true},
+  'Z':{fingers:[false,true,false,false,false], motion:'right',palmOut:true},
+  // ── Numbers ──
+  '1':{fingers:[false,true,false,false,false], motion:null,palmOut:true},
+  '2':{fingers:[false,true,true,false,false],  motion:null,palmOut:true},
+  '3':{fingers:[true,true,true,false,false],   motion:null,palmOut:true},
+  '4':{fingers:[false,true,true,true,true],    motion:null,palmOut:true},
+  '5':{fingers:[true,true,true,true,true],     motion:null,palmOut:true},
+  '6':{fingers:[true,false,false,false,true],  motion:null,palmOut:true},
+  '7':{fingers:[true,false,false,false,false], motion:null,palmOut:true},
+  '8':{fingers:[false,false,true,false,false], motion:null,palmOut:true},
+  '9':{fingers:[false,true,false,false,false], motion:null,palmOut:true},
+  '10':{fingers:[true,false,false,false,false],motion:null,palmOut:true},
+  // ── Time ──
+  'Today':    {fingers:[true,true,true,true,true],   motion:'down',   palmOut:null},
+  'Yesterday':{fingers:[true,false,false,false,false],motion:'left',  palmOut:null},
+  'Tomorrow': {fingers:[true,false,false,false,false],motion:'right', palmOut:null},
+  'Week':     {fingers:[false,true,false,false,false],motion:'right', palmOut:null},
+  // ── Family ──
+  'Mother':   {fingers:[true,true,true,true,true],   position:'chin',    motion:null,palmOut:true},
+  'Father':   {fingers:[true,true,true,true,true],   position:'forehead',motion:null,palmOut:true},
+  'Friend':   {fingers:[false,true,false,false,false],motion:null,palmOut:null},
+  'Family':   {fingers:[false,true,true,true,true],  motion:'right',palmOut:true},
+  'Baby':     {fingers:[true,true,true,true,true],   motion:'down', palmOut:null},
+  'Happy':    {fingers:[true,true,true,true,true],   motion:'up',   position:'chest',palmOut:true},
+  'Sad':      {fingers:[true,true,true,true,true],   motion:'down', palmOut:true},
+  'Angry':    {fingers:[false,true,true,true,false], motion:'out',  palmOut:null},
+  'Scared':   {fingers:[true,true,true,true,true],   motion:'left', palmOut:null},
+  // ── Daily life ──
+  'Eat':      {fingers:[false,false,false,false,false],position:'mouth',motion:null,palmOut:null},
+  'Drink':    {fingers:[false,false,false,false,false],position:'mouth',motion:null,palmOut:null},
+  'Water':    {fingers:[false,true,true,false,false], position:'chin', motion:null,palmOut:true},
+  'Coffee':   {fingers:[false,false,false,false,false],motion:null,palmOut:null},
+  'Home':     {fingers:[false,false,false,false,false],position:'mouth',motion:null,palmOut:null},
+  'School':   {fingers:[true,true,true,true,true],   motion:'down', palmOut:null},
+  'Work':     {fingers:[false,false,false,false,false],motion:'down', palmOut:null},
+  'Help':     {fingers:[true,false,false,false,false],motion:'up',   palmOut:null},
+  'Stop':     {fingers:[true,true,true,true,true],   motion:'down', palmOut:true},
+  'Doctor':   {fingers:[false,true,true,false,false], position:'any',motion:null,palmOut:null},
+  'Police':   {fingers:[false,true,true,true,false], position:'chest',motion:null,palmOut:null},
+};
+
+// ── Multi-component scoring (finger + motion + position + palm) ───────────────
+// Returns {total:0-100, fingerPct, motionOk, positionOk, palmOk, breakdown}
+function scoreSignFull(fingers, lm, signWord){
+  const def=SIGN_DEF[signWord];
+  if(!def)return{total:0,fingerPct:0,motionOk:null,positionOk:null,palmOk:null};
+
+  // 1. Finger score (always present) — weight 60%
+  let fingerMatches=0;
+  fingers.forEach((f,i)=>{if(f===def.fingers[i])fingerMatches++;});
+  const fingerPct=fingerMatches/5; // 0-1
+
+  // 2. Motion check — weight 20% (only if sign requires motion)
+  let motionOk=null, motionWeight=0;
+  if(def.motion){
+    motionWeight=0.2;
+    const detected=getMotion();
+    motionOk=detected===def.motion;
+  }
+
+  // 3. Position check — weight 15% (only if sign has position req)
+  let positionOk=null, positionWeight=0;
+  if(def.position&&def.position!=='any'){
+    positionWeight=0.15;
+    if(def.position==='forehead')positionOk=wristNearForehead(lm);
+    else if(def.position==='chin')positionOk=wristNearChin(lm);
+    else if(def.position==='chest')positionOk=wristNearChest(lm);
+    else if(def.position==='mouth')positionOk=wristNearMouth(lm);
+  }
+
+  // 4. Palm direction — weight 5% bonus only
+  let palmOk=null;
+  if(def.palmOut!==null&&def.palmOut!==undefined){
+    palmOk=palmFacing(lm)===def.palmOut;
+  }
+
+  // Weighted total
+  const fingerWeight=1-(motionWeight+positionWeight);
+  let total=fingerPct*fingerWeight;
+  if(def.motion)  total+=(motionOk?1:0)*motionWeight;
+  if(def.position&&def.position!=='any') total+=(positionOk?1:0)*positionWeight;
+  // Palm: soft bonus (doesn't penalise hard)
+  if(palmOk===false)total=Math.max(0,total-0.05);
+
+  return{
+    total:Math.round(total*100),
+    fingerPct:Math.round(fingerPct*100),
+    motionOk, positionOk, palmOk,
+    needsMotion:!!def.motion,
+    needsPosition:!!(def.position&&def.position!=='any'),
+    requiredMotion:def.motion,
+    requiredPosition:def.position,
+  };
 }
 
+// ── Main result handler ───────────────────────────────────────────────────────
 let fpsFrames=0,fpsTime=0;
 
 function onHandResults(results){
@@ -742,7 +1209,6 @@ function onHandResults(results){
   canvas.height=video.videoHeight||480;
   ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  // FPS counter
   fpsFrames++;
   const now=performance.now();
   if(now-fpsTime>1000){
@@ -753,7 +1219,7 @@ function onHandResults(results){
 
   if(!results.multiHandLandmarks?.length){
     setCamStatus('detecting');
-    setFeedback('🖐','Show your hand to the camera — make sure there is good lighting');
+    setFeedback('🖐','Show your hand to the camera — good lighting helps');
     setConf(0);
     updateFingers([false,false,false,false,false],null);
     matchHoldFrames=0;
@@ -766,59 +1232,83 @@ function onHandResults(results){
   drawLandmarks(ctx,lm,{color:'#a78bfa',lineWidth:1,radius:3.5});
   ctx.restore();
 
+  pushWrist(lm);
+
   const sign=curLesson?.signs[lessonStep];
   if(!sign)return;
-  const target=FINGER_TARGETS[sign.w];
-
+  const def=SIGN_DEF[sign.w];
   const fingers=getFingers(lm);
-  updateFingers(fingers,target);
+  updateFingers(fingers,def?.fingers||null);
   setCamStatus('detecting');
 
-  if(!target){
+  if(!def){
     setFeedback('👋',`No detection for <b>${sign.w}</b> — practise the shape manually`);
     return;
   }
 
-  const pct=scoreSign(fingers,target);
-  setConf(pct);
+  const score=scoreSignFull(fingers,lm,sign.w);
+  setConf(score.total);
 
-  if(pct===100){
+  // Build contextual hint based on what's missing
+  function hint(){
+    if(score.fingerPct<80){
+      const wrong=fingers.map((f,i)=>f!==def.fingers[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
+      return wrong.length?`Adjust your <b>${wrong.join(', ')}</b>`:'Check your finger positions';
+    }
+    if(score.needsMotion&&!score.motionOk){
+      const dir={up:'upward',down:'downward',left:'to the left',right:'to the right',out:'outward'}[score.requiredMotion]||score.requiredMotion;
+      return `Now move your hand <b>${dir}</b>`;
+    }
+    if(score.needsPosition&&!score.positionOk){
+      const pos={forehead:'forehead',chin:'chin/mouth area',chest:'chest',mouth:'mouth'}[score.requiredPosition]||score.requiredPosition;
+      return `Bring your hand near your <b>${pos}</b>`;
+    }
+    return 'Almost — hold it steady';
+  }
+
+  if(score.total>=90){
     matchHoldFrames++;
     const hp=Math.min(100,Math.round((matchHoldFrames/HOLD_NEEDED)*100));
-    setFeedback('🎯',`<b>Perfect form!</b> Hold it... ${hp<100?hp+'%':'Done! ✓'}`,'good');
+    setFeedback('✅',`<b>Looks right!</b> ${score.needsMotion?'Motion detected — ':''}Hold steady... ${hp<100?'':'Done ✓'}`,'good');
     if(matchHoldFrames>=HOLD_NEEDED&&!lessonSignsDone.has(lessonStep)){
       lessonSignsDone.add(lessonStep);
-      clearSmooth();
+      comboCount++;
+      const comboBonus=Math.min(comboCount-1,5)*2; // up to +10 bonus XP for combos
+      clearSmooth();clearMotion();
       const ring=document.getElementById('matchRing');
       if(ring){ring.classList.add('show');setTimeout(()=>ring.classList.remove('show'),700);}
-      setFeedback('🎉',`<b>${sign.w}</b> mastered! Moving on...`,'good');
+      const comboTxt=comboCount>1?` <span style="color:var(--am)">×${comboCount} combo!</span>`:'';
+      setFeedback('🎉',`<strong style="font-size:15px">🔥 ${sign.w}!</strong>${comboTxt} Moving on...`,'good');
+      showXPPop(5+comboBonus, comboCount>1?`×${comboCount} Combo!`:sign.w);
       setTimeout(()=>{
         matchHoldFrames=0;
         const nextIdx=lessonStep+1;
         if(nextIdx<curLesson.signs.length)switchLessonSign(nextIdx);
         else{lessonStep=curLesson.signs.length;renderLesson();}
-      },1400);
+      },1800);
     }
-  } else if(pct>=80){
+  } else if(score.total>=70){
     matchHoldFrames=0;
-    const wrong=fingers.map((f,i)=>f!==target[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
-    setFeedback('👍',`Almost! Adjust your <b>${wrong.join(', ')}</b>`,'warn');
-  } else if(pct>=60){
+    setFeedback('👍',hint(),'warn');
+  } else if(score.total>=45){
     matchHoldFrames=0;
-    const wrong=fingers.map((f,i)=>f!==target[i]?['Thumb','Index','Middle','Ring','Pinky'][i]:null).filter(Boolean);
-    setFeedback('🤔',`Getting closer — fix <b>${wrong.join(', ')}</b> (${pct}% match)`);
+    setFeedback('🤔',hint());
   } else {
     matchHoldFrames=0;
-    setFeedback('👋',`Form the <b>${sign.w}</b> sign — follow the numbered steps on the left`);
+    setFeedback('👋',`Form the <b>${sign.w}</b> sign — follow the numbered steps`);
   }
 }
 
 async function initMediaPipe(){
   if(mpReady)return;
-  mpHands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands/${f}`});
+  // Check CDN scripts loaded — "Script error" usually means CDN blocked or failed
+  if(typeof Hands==='undefined'){
+    throw new Error('MediaPipe failed to load — check your internet connection and try refreshing.');
+  }
+  mpHands=new Hands({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${f}`});
   mpHands.setOptions({maxNumHands:1,modelComplexity:1,minDetectionConfidence:0.7,minTrackingConfidence:0.6});
   mpHands.onResults(onHandResults);
-  // Warm up
+  // Warm up with blank frame
   const tmp=document.createElement('canvas');tmp.width=64;tmp.height=64;
   await mpHands.send({image:tmp}).catch(()=>{});
   mpReady=true;
