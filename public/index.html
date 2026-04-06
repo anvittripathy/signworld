@@ -132,7 +132,10 @@ input::placeholder{color:var(--mu)}
   <div>
     <div style="font-size:12px;color:#a78bfa;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px">🌍 466 million deaf people. Start communicating today.</div>
     <h1 style="font-size:clamp(28px,5vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.1;margin-bottom:16px">The only way to<br>learn a sign is to<br><span style="background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">actually do it.</span></h1>
-    <p style="font-size:16px;color:var(--mu);line-height:1.7;margin-bottom:28px">Point your camera. Form the sign.<br>Get instant feedback. No account needed.</p>
+    <div style="background:rgba(239,68,68,.07);border:1px solid rgba(239,68,68,.15);border-radius:12px;padding:13px 16px;margin-bottom:20px;font-size:13px;color:#fca5a5;line-height:1.6">
+      When a deaf person tries to communicate with you and you can't respond — that silence is what you're here to fix.
+    </div>
+    <p style="font-size:16px;color:var(--mu);line-height:1.7;margin-bottom:28px">Point your camera. Form the sign. Get instant feedback.<br><span style="color:#a78bfa;font-weight:600">99% of people never learn a single sign.</span> Be different.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px">
       <button class="btn-p" style="font-size:15px;padding:13px 32px" id="heroStartBtn">🤟 Try your first sign →</button>
     </div>
@@ -558,16 +561,12 @@ function onHomeResults(results){
     document.getElementById('homeSdot').className='sdot on';
     document.getElementById('homeStatus').textContent='🎯 ILY detected!';
     if(txt) txt.textContent='Perfect! Hold it... '+Math.min(100,Math.round(homeMatchFrames/8*100))+'%';
-    if(homeMatchFrames>=8){
+       if(homeMatchFrames>=8){
       const flash=document.getElementById('homeMatchFlash');
       if(flash){flash.style.opacity='1';setTimeout(()=>flash.style.opacity='0',600);}
-      if(txt) txt.innerHTML='<strong style="color:var(--g)">🎉 You just signed I Love You!</strong> Start lessons to learn more →';
+      if(txt) txt.innerHTML='<strong style="color:var(--g)">You just did something 99% of people never will.</strong>';
       homeMatchFrames=0;
-      // Nudge to start after success
-      setTimeout(()=>{
-        const dest=ST.name?'dashboard':'onboard';
-        showToast('🤟 You got it! Ready to learn more?','var(--g)');
-      },800);
+      setTimeout(()=>showHomeMilestoneModal(),900);
     }
   } else {
     homeMatchFrames=0;
@@ -580,6 +579,42 @@ function onHomeResults(results){
       if(txt) txt.textContent=score>=40?'Getting closer — extend pinky + index + thumb':'Extend your pinky, index finger, and thumb';
     }
   }
+}
+
+function showHomeMilestoneModal(){
+  // Remove existing
+  const existing=document.getElementById('homeMilestoneModal');
+  if(existing) existing.remove();
+
+  const dest=ST.name?'dashboard':'onboard';
+  const modal=document.createElement('div');
+  modal.id='homeMilestoneModal';
+  modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:9999;padding:24px;backdrop-filter:blur(4px)';
+  modal.innerHTML=`
+    <div style="max-width:400px;width:100%;background:var(--s2);border:1px solid rgba(108,71,255,.3);border-radius:24px;padding:36px 28px;text-align:center;animation:pop .35s cubic-bezier(.34,1.56,.64,1) both">
+      <div style="font-size:52px;margin-bottom:14px">🤟</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:1.5px;color:#a78bfa;text-transform:uppercase;margin-bottom:10px">First sign complete</div>
+      <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;line-height:1.3;margin-bottom:10px">You just did something<br>99% of people never will.</h2>
+      <p style="font-size:14px;color:var(--mu);line-height:1.7;margin-bottom:24px">
+        Learn 3 signs and you can already communicate more than most hearing people ever will in their lifetime.
+      </p>
+      <div style="background:rgba(108,71,255,.08);border:1px solid rgba(108,71,255,.2);border-radius:12px;padding:14px;margin-bottom:20px;font-size:13px;color:var(--tx)">
+        <strong>Your first goal:</strong> Learn 3 signs<br>
+        <span style="color:var(--mu);font-size:12px">Unlock your first real conversation phrase</span>
+      </div>
+      <button onclick="document.getElementById('homeMilestoneModal').remove();go('${dest}')" 
+        style="width:100%;padding:14px;background:linear-gradient(135deg,#6c47ff,#ff4791);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:900;cursor:pointer;font-family:inherit;letter-spacing:-.3px">
+        Start my 3-sign challenge →
+      </button>
+      <button onclick="document.getElementById('homeMilestoneModal').remove()" 
+        style="width:100%;padding:10px;background:transparent;border:none;color:var(--mu);font-size:13px;cursor:pointer;font-family:inherit;margin-top:8px">
+        Maybe later
+      </button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  // Close on backdrop click
+  modal.onclick=e=>{if(e.target===modal)modal.remove();};
 }
 
 function stopHomeCamera(){
@@ -685,9 +720,12 @@ function renderDash(){
     :purposeLines[ST.done.length % purposeLines.length];
   const pct=Math.round((ST.done.length/ALL.length)*100);
   el.innerHTML=`
-    <div style="margin-bottom:20px">
-      <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px">Hey ${ST.name||'there'} \u{1F44B}</h2>
-      <div style="font-size:13px;color:var(--mu);line-height:1.5">${identityMsg}</div>
+    <div style="margin-bottom:20px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+      <div>
+        <h2 style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px">Hey ${ST.name||'there'} \u{1F44B}</h2>
+        <div style="font-size:13px;color:var(--mu);line-height:1.5">${identityMsg}</div>
+      </div>
+      ${ST.done.length>=3?`<button onclick="go('share')" style="flex-shrink:0;padding:8px 14px;background:rgba(255,71,145,.12);border:1px solid rgba(255,71,145,.25);border-radius:10px;color:#ff4791;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap">\u{1F3C6} Share achievement</button>`:''}
     </div>
     ${ST.streak>0?`<div style="background:rgba(245,158,11,.09);border:1px solid rgba(245,158,11,.2);border-radius:12px;padding:12px 16px;margin-bottom:18px;font-size:13px;color:var(--am)">${streakMsg}</div>`:''}
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px">
@@ -929,9 +967,28 @@ function answerQuiz(chosen,correct,lid,xpAmt){
   cb.className='btn-p';cb.style.cssText=`margin-top:14px;width:100%;background:${curLesson?.col||'#6c47ff'}`;
   cb.textContent=`✅ Mark lesson done  +${xpAmt} XP`;
   cb.onclick=()=>{
+    const wasFirst=ST.done.length===0;
     markDone(lid,curLesson?.signs||[],xpAmt);
     showXPPop(xpAmt,'Lesson Complete!');
-    setTimeout(()=>{stopCamera();go('dashboard');},1400);
+    const identityToast=
+      wasFirst?'🤟 First sign done. Goal: learn 3 signs to unlock your first real conversation.'
+      :ST.done.length===3?'You can now communicate more than 99% of people. Share this?'
+      :ST.done.length===5?'🏆 5 lessons done. You are building a skill most people ignore their entire life.'
+      :ST.done.length===10?'🌟 10 lessons. You are now genuinely fluent in basic sign language.'
+      :null;
+    setTimeout(()=>{
+      stopCamera();
+      go('dashboard');
+      if(identityToast){
+        setTimeout(()=>{
+          showToast(identityToast,'var(--ac)');
+          // After 3 lessons, prompt to share
+          if(ST.done.length===3){
+            setTimeout(()=>showToast('🏆 Tap "Share achievement" to show the world →','#ff4791'),3500);
+          }
+        },600);
+      }
+    },1400);
   };
   fb.after(cb);
 }
@@ -1398,28 +1455,107 @@ function renderProg(){
 // ─────────────────────────────────────────────────────────────────────────────
 // SHARE
 // ─────────────────────────────────────────────────────────────────────────────
+function copyChallenge(btn){
+  const t='Can you beat my '+ST.signs.length+' signs? 🤟 I learned sign language on SignWorld — real-time hand detection, zero videos. Try it free: signworld.app';
+  navigator.clipboard?.writeText(t).catch(()=>{});
+  if(btn){btn.textContent='Copied ✓';setTimeout(()=>btn.textContent='Copy challenge link',2000);}
+}
+
 function renderShare(){
   const el=document.getElementById('shareBody');if(!el)return;
-  const msgs=[
-    `I just learned ${ST.signs.length} signs in sign language on SignWorld! 🤟 466 million deaf people deserve to be heard. Join me → signworld.app`,
-    `Day ${ST.streak} of learning ASL! Completed ${ST.done.length} lessons and earned ${ST.xp} XP. Learn for free → signworld.app 🤟`,
-    `Sign language connects us. I've learned ${ST.signs.length} signs so far. Try SignWorld free → signworld.app #SignLanguage #Accessibility`
-  ];
-  el.innerHTML=`<h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">Share Your Progress</h2><p style="color:var(--mu);font-size:13px;margin-bottom:26px">Let the world know you're learning sign language</p>
-    <div style="background:linear-gradient(135deg,#131720,#1a1f2e);border:1px solid rgba(108,71,255,.3);border-radius:20px;padding:32px;margin-bottom:24px">
-      <div style="font-size:36px;margin-bottom:12px">🤟</div>
-      <div style="font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px;background:linear-gradient(135deg,#6c47ff,#ff4791);-webkit-background-clip:text;-webkit-text-fill-color:transparent">SignWorld Learner</div>
-      <div style="font-size:13px;color:var(--mu);margin-bottom:20px">${ST.name||'Anonymous'} · ${new Date().toLocaleDateString()}</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px">
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">🏆</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.xp}</div><div style="font-size:11px;color:var(--mu)">Total XP</div></div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">📚</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.done.length}</div><div style="font-size:11px;color:var(--mu)">Lessons</div></div>
-        <div style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px"><div style="font-size:18px;margin-bottom:4px">🤟</div><div style="font-size:22px;font-weight:900;color:var(--tx)">${ST.signs.length}</div><div style="font-size:11px;color:var(--mu)">Signs</div></div>
+
+  // Ego-based identity tier based on signs learned
+  const tier=
+    ST.signs.length===0?{label:'Just Started',icon:'🌱',pct:'top 30%',color:'#34d399'}
+    :ST.signs.length<5 ?{label:'Beginner Signer',icon:'✋',pct:'top 20%',color:'#06b6d4'}
+    :ST.signs.length<15?{label:'Emerging Signer',icon:'🤟',pct:'top 10%',color:'#6c47ff'}
+    :ST.signs.length<30?{label:'Fluency Builder',icon:'🏆',pct:'top 5%',color:'#f59e0b'}
+    :               {label:'Advanced Signer',icon:'🌟',pct:'top 1%',color:'#ff4791'};
+
+  // WhatsApp share text — ego hook
+  const waText=encodeURIComponent(
+    `🤟 I just learned ${ST.signs.length} signs in sign language on SignWorld.
+
+`+
+    `99% of people never learn a single sign. I did it using real-time hand detection — no videos, no boring lessons.
+
+`+
+    `Try it free: signworld.app`
+  );
+  const twitterText=encodeURIComponent(
+    `I just learned ${ST.signs.length} ASL signs on @SignWorld 🤟
+
+`+
+    `99% of people never learn sign language. I'm in the ${tier.pct} who did.
+
+`+
+    `Try it free → signworld.app #SignLanguage #Accessibility`
+  );
+  const linkedinText=
+    `I just learned ${ST.signs.length} signs in ASL using SignWorld 🤟
+
+`+
+    `466 million deaf people exist. Most hearing people can't communicate with a single one of them.
+
+`+
+    `I spent ${ST.done.length} lessons learning to change that. The app uses real-time hand detection to tell you exactly which fingers to adjust.
+
+`+
+    `Try it free: signworld.app`;
+
+  el.innerHTML=`
+    <h2 style="font-size:20px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">Your Achievement</h2>
+    <p style="color:var(--mu);font-size:13px;margin-bottom:24px">You're in the ${tier.pct} of people who can sign</p>
+
+    <!-- Achievement card -->
+    <div id="achieveCard" style="background:linear-gradient(135deg,#0d1118,#1a1f2e);border:2px solid ${tier.color}44;border-radius:24px;padding:36px 28px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;top:-40px;right:-40px;font-size:120px;opacity:.06;pointer-events:none">${tier.icon}</div>
+      <div style="font-size:48px;margin-bottom:10px">${tier.icon}</div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:2px;color:${tier.color};text-transform:uppercase;margin-bottom:6px">${tier.pct} worldwide</div>
+      <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;background:linear-gradient(135deg,${tier.color},#fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${tier.label}</div>
+      <div style="font-size:13px;color:var(--mu);margin-bottom:24px">${ST.name||'Anonymous'} · ${new Date().toLocaleDateString()}</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px">
+          <div style="font-size:20px;font-weight:900;color:${tier.color}">${ST.signs.length}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">Signs learned</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px">
+          <div style="font-size:20px;font-weight:900;color:${tier.color}">🔥${ST.streak}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">Day streak</div>
+        </div>
+        <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:12px">
+          <div style="font-size:20px;font-weight:900;color:${tier.color}">${ST.xp}</div>
+          <div style="font-size:10px;color:var(--mu);margin-top:2px">Total XP</div>
+        </div>
       </div>
-      <div style="font-size:13px;color:#a78bfa;font-weight:600">signworld.app · Learn sign language free 🌍</div>
+      <div style="font-size:12px;color:${tier.color};font-weight:700;letter-spacing:.3px">signworld.app · Real-time sign language learning 🌍</div>
     </div>
-    ${['LinkedIn','Twitter/X','WhatsApp'].map((pl,i)=>`<div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px;text-align:left"><div style="font-size:12px;color:var(--mu);margin-bottom:8px">${pl}</div><div style="font-size:13px;color:var(--tx);line-height:1.6;margin-bottom:10px">${msgs[i]}</div><button id="cp${i}" onclick="copyMsg(${i},'cp${i}')" style="padding:6px 14px;background:rgba(108,71,255,.15);border:1px solid rgba(108,71,255,.3);border-radius:8px;color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button></div>`).join('')}
-    <div style="margin-top:18px;padding:14px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.2);border-radius:12px;font-size:13px;color:#4ade80">🎯 Every share brings awareness to the deaf community. Thank you for spreading inclusion.</div>`;
-  window.copyMsg=(i,btnId)=>{navigator.clipboard?.writeText(msgs[i]).catch(()=>{});const b=document.getElementById(btnId);if(b){b.textContent='Copied! ✓';setTimeout(()=>b.textContent='Copy',2000);}};
+
+    <!-- Share buttons — platform specific -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+      <a href="https://wa.me/?text=${waText}" target="_blank" rel="noopener"
+         style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#25D366;border-radius:12px;color:#fff;font-size:13px;font-weight:800;text-decoration:none">
+        💬 Share on WhatsApp
+      </a>
+      <a href="https://twitter.com/intent/tweet?text=${twitterText}" target="_blank" rel="noopener"
+         style="display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;background:#1DA1F2;border-radius:12px;color:#fff;font-size:13px;font-weight:800;text-decoration:none">
+        🐦 Post on Twitter/X
+      </a>
+    </div>
+    <button id="copyLinkedIn" onclick="
+      navigator.clipboard?.writeText(${JSON.stringify(linkedinText)}).catch(()=>{});
+      this.textContent='Copied for LinkedIn ✓';
+      setTimeout(()=>this.textContent='📋 Copy LinkedIn Post',2000);
+    " style="width:100%;padding:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;color:var(--tx);font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:20px">
+      📋 Copy LinkedIn Post
+    </button>
+
+    <!-- Challenge hook -->
+    <div style="background:rgba(108,71,255,.08);border:1px solid rgba(108,71,255,.2);border-radius:14px;padding:16px 18px;text-align:left">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px">🎯 Challenge a friend</div>
+      <div style="font-size:12px;color:var(--mu);margin-bottom:10px;line-height:1.6">Send them your link and see if they can beat your ${ST.signs.length} signs. Most people give up after 2.</div>
+      <button onclick="copyChallenge(this)" style="padding:8px 16px;background:var(--ac);border:none;border-radius:9px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">Copy challenge link</button>
+    </div>`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
